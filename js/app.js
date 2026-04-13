@@ -73,6 +73,7 @@ function App({ onLogout }) {
     const newTicket = { id: makeId(), riderNo: form.riderNo, riderName: form.riderName, issue: form.issue, category: form.category, timestampReceived: now, acknowledged: false, acknowledgedAt: "", responsiblePerson: form.responsiblePerson, escalatedTo: form.escalatedTo, solution: "", status: form.status, timestampSolved: form.status === "Resolved" ? now : "", description: form.description, comments: [], lastUpdated: now, importedDurationLabel: undefined, importedDurationDays: null };
     setTickets((prev) => [newTicket].concat(prev));
     setSelectedTicketId(newTicket.id);
+    sendTicketToSheet(newTicket);
   }
 
   if (sheetLoading) return <div className="min-h-screen bg-slate-100 flex items-center justify-center text-slate-500">Loading tickets from spreadsheet...</div>;

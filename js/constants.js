@@ -8,7 +8,8 @@ const STATUS_STYLES = {
   Resolved: "bg-emerald-100 text-emerald-700 border-emerald-200",
 };
 
-const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQfH0bigvniWKKso1bI3xchUOheY3pbtcUCisvkeJC-ahyo2ACNDLOXmXkJ1GZUXvttjwJ7xJeaxDqv/pub?output=csv";
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS05MePtZD30llXOsxZLoJKFXDMd1hhWILUffi2HFRGR07ayEOQZbugrJK6Bud9-ADu0xiipgnsEwh6/pub?output=csv";
+const SHEET_WRITE_URL = "https://script.google.com/macros/s/AKfycbxthGdptwZIe_CpfdRtmjqEM-qZHNyhWK9Ogw7zFVONgKwl6Jv7SmU0QNODXITTFIrVkw/exec";
 
 function parseCSV(text) {
   var rows = [];
@@ -72,6 +73,25 @@ function sheetRowToTicket(row, index) {
     importedDurationLabel: durationLabel || undefined,
     importedDurationDays: parseDurationLabelToDays(durationLabel),
   };
+}
+
+function sendTicketToSheet(ticket) {
+  return fetch(SHEET_WRITE_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      riderNo: ticket.riderNo,
+      riderName: ticket.riderName,
+      issue: ticket.issue,
+      timestampReceived: new Date().toLocaleString("en-GB", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true }),
+      acknowledged: ticket.acknowledged ? "Done" : "",
+      responsiblePerson: ticket.responsiblePerson,
+      escalatedTo: ticket.escalatedTo,
+      solution: ticket.solution,
+      status: ticket.status,
+      timestampSolved: ticket.status === "Resolved" ? new Date().toLocaleString("en-GB", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true }) : "",
+      duration: ""
+    }),
+  }).catch(function (err) { console.error("Failed to write to sheet:", err); });
 }
 
 function fetchSheetData() {
