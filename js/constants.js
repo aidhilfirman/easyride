@@ -95,7 +95,7 @@ function sendTicketToSheet(ticket) {
 }
 
 function fetchSheetData() {
-  return fetch(SHEET_CSV_URL)
+  return fetch(SHEET_CSV_URL + "&_t=" + Date.now())
     .then(function (res) { return res.text(); })
     .then(function (text) {
       var rows = parseCSV(text);
