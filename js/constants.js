@@ -8,13 +8,78 @@ const STATUS_STYLES = {
   Resolved: "bg-emerald-100 text-emerald-700 border-emerald-200",
 };
 
-const IMPORTED_ROWS = [
-  ["TKT-1001", "Rider 094", "Khairul", "Incomplete onboarding documents (missing SG Class 2B, log card, insurance)", "Account", "2025-01-09T00:00:00", true, "Ally", "", "Follow-up checklist, partial documents submitted, continued onboarding", "Resolved", "2025-01-09T12:00:00", "Same day"],
-  ["TKT-1002", "Rider 094", "Khairul", "Grab account setup issue (login / loading error)", "Account", "2025-01-09T00:00:00", true, "Ally / Dominic", "Grab", "Reinstall app, switch email, resubmit documents", "Resolved", "2025-01-09T16:00:00", "~1 day"],
-  ["TKT-1003", "Rider 102", "Samsul", "App error and unable to proceed onboarding", "App Issue", "2025-01-10T00:00:00", true, "Dominic", "Grab", "Resubmission + backend refresh + follow-up", "Resolved", "2025-01-10T18:00:00", "Same day"],
-  ["TKT-1004", "Rider 081", "Chan Sikeen", "Appeal for incentive exception after cancellation penalty", "Payment", "2025-01-11T00:00:00", true, "Team", "Grab Finance", "Escalated to Grab for review; outcome aligned with policy", "Resolved", "2025-04-11T00:00:00", "72 days"],
-  ["TKT-1005", "Rider 066", "Izzatul", "Bank account issue causing payout risk", "Payment", "2025-01-11T00:00:00", true, "Dominic / Ally", "", "Requested bank account correction and update verification", "Resolved", "2025-01-11T08:00:00", "1 day"],
-  ["TKT-1006", "Rider 040", "Fauzan", "Insurance does not cover food delivery", "Vehicle", "2025-01-12T00:00:00", false, "Dominic", "Insurance / Grab", "Pending clarification and policy confirmation", "Escalated", "", ""],
-  ["TKT-1007", "Rider 069", "Azrul", "HR admin friction with repeated requests", "Account", "2025-08-24T00:00:00", false, "Admin", "", "Follow-up still ongoing on document handling", "In Progress", "", ""],
-  ["TKT-1008", "Rider 048", "Razif", "Did not submit required HR documents", "Account", "2025-08-24T00:00:00", false, "Admin", "", "Awaiting rider submission", "Open", "", ""],
-];
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQfH0bigvniWKKso1bI3xchUOheY3pbtcUCisvkeJC-ahyo2ACNDLOXmXkJ1GZUXvttjwJ7xJeaxDqv/pub?output=csv";
+
+function parseCSV(text) {
+  var rows = [];
+  var row = [];
+  var field = "";
+  var inQuotes = false;
+  for (var i = 0; i < text.length; i++) {
+    var ch = text[i];
+    if (inQuotes) {
+      if (ch === '"' && text[i + 1] === '"') { field += '"'; i++; }
+      else if (ch === '"') { inQuotes = false; }
+      else { field += ch; }
+    } else {
+      if (ch === '"') { inQuotes = true; }
+      else if (ch === ',') { row.push(field.trim()); field = ""; }
+      else if (ch === '\n' || (ch === '\r' && text[i + 1] === '\n')) {
+        if (ch === '\r') i++;
+        row.push(field.trim());
+        rows.push(row);
+        row = [];
+        field = "";
+      } else { field += ch; }
+    }
+  }
+  if (field || row.length) { row.push(field.trim()); rows.push(row); }
+  return rows;
+}
+
+function sheetRowToTicket(row, index) {
+  var riderNo = row[0] || "";
+  var riderName = row[1] || "";
+  var issue = row[2] || "";
+  var timestampReceived = row[3] || "";
+  var acknowledged = (row[4] || "").toLowerCase() === "done";
+  var responsiblePerson = row[5] || "";
+  var escalatedTo = (row[6] || "").trim();
+  var solution = row[7] || "";
+  var status = row[8] || "Open";
+  var timestampSolved = row[9] || "";
+  var durationLabel = row[10] || "";
+
+  if (["Open", "In Progress", "Escalated", "Resolved"].indexOf(status) === -1) status = "Open";
+
+  return {
+    id: "TKT-" + String(index + 1).padStart(4, "0"),
+    riderNo: riderNo,
+    riderName: riderName,
+    issue: issue,
+    category: "Others",
+    timestampReceived: timestampReceived,
+    acknowledged: acknowledged,
+    acknowledgedAt: acknowledged ? timestampReceived : "",
+    responsiblePerson: responsiblePerson,
+    escalatedTo: escalatedTo,
+    solution: solution,
+    status: status,
+    timestampSolved: timestampSolved,
+    description: issue,
+    comments: [],
+    lastUpdated: timestampSolved || timestampReceived,
+    importedDurationLabel: durationLabel || undefined,
+    importedDurationDays: parseDurationLabelToDays(durationLabel),
+  };
+}
+
+function fetchSheetData() {
+  return fetch(SHEET_CSV_URL)
+    .then(function (res) { return res.text(); })
+    .then(function (text) {
+      var rows = parseCSV(text);
+      rows.shift();
+      return rows.filter(function (r) { return r[0] && r[0].trim(); }).map(sheetRowToTicket);
+    });
+}

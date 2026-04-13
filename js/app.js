@@ -1,6 +1,14 @@
 function App({ onLogout }) {
-  const [tickets, setTickets] = useState(INITIAL_TICKETS);
-  const [selectedTicketId, setSelectedTicketId] = useState(INITIAL_TICKETS[0] ? INITIAL_TICKETS[0].id : "");
+  const [tickets, setTickets] = useState([]);
+  const [selectedTicketId, setSelectedTicketId] = useState("");
+  const [sheetLoading, setSheetLoading] = useState(true);
+
+  useEffect(() => {
+    fetchSheetData()
+      .then((data) => { setTickets(data); if (data[0]) setSelectedTicketId(data[0].id); })
+      .catch((err) => console.error("Failed to load sheet:", err))
+      .finally(() => setSheetLoading(false));
+  }, []);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [quickFilter, setQuickFilter] = useState("all");
@@ -66,6 +74,8 @@ function App({ onLogout }) {
     setTickets((prev) => [newTicket].concat(prev));
     setSelectedTicketId(newTicket.id);
   }
+
+  if (sheetLoading) return <div className="min-h-screen bg-slate-100 flex items-center justify-center text-slate-500">Loading tickets from spreadsheet...</div>;
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">

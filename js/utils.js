@@ -56,11 +56,3 @@ function makeId() {
   return "TKT-" + Math.floor(1000 + Math.random() * 9000);
 }
 
-function buildInitialTickets(rows) {
-  return rows.map((row) => {
-    const [id, riderNo, riderName, issue, category, timestampReceived, acknowledged, responsiblePerson, escalatedTo, solution, status, timestampSolved, importedDurationLabel] = row;
-    return { id, riderNo, riderName, issue, category, timestampReceived, acknowledged, acknowledgedAt: acknowledged ? timestampReceived : "", responsiblePerson, escalatedTo, solution, status, timestampSolved, description: issue, comments: [], lastUpdated: timestampSolved || timestampReceived, importedDurationLabel, importedDurationDays: parseDurationLabelToDays(importedDurationLabel) };
-  });
-}
-
-const INITIAL_TICKETS = buildInitialTickets(IMPORTED_ROWS);
