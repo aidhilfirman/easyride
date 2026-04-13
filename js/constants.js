@@ -82,14 +82,14 @@ function sendTicketToSheet(ticket) {
       riderNo: ticket.riderNo,
       riderName: ticket.riderName,
       issue: ticket.issue,
-      timestampReceived: new Date().toLocaleString("en-GB", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true }),
+      timestampReceived: ticket.timestampReceived || "",
       acknowledged: ticket.acknowledged || "",
       responsiblePerson: ticket.responsiblePerson,
       escalatedTo: ticket.escalatedTo,
-      solution: ticket.solution,
+      solution: ticket.solution || "",
       status: ticket.status,
-      timestampSolved: ticket.status === "Resolved" ? new Date().toLocaleString("en-GB", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true }) : "",
-      duration: ""
+      timestampSolved: ticket.timestampSolved || "",
+      duration: ticket.duration || ""
     }),
   }).catch(function (err) { console.error("Failed to write to sheet:", err); });
 }
