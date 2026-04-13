@@ -34,64 +34,19 @@ function TicketDrawer({ ticket, onClose, onChange, onSave, onDelete, onAddCommen
           </div>
           <button type="button" onClick={onClose} className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50">Close</button>
         </div>
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border border-slate-200 bg-white p-4">
-              <div className="text-xs uppercase tracking-wide text-slate-500">Rider No.</div>
-              <div className="mt-1 text-sm font-medium text-slate-900">{ticket.riderNo}</div>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4">
-              <div className="text-xs uppercase tracking-wide text-slate-500">Rider Name</div>
-              <div className="mt-1 text-sm font-medium text-slate-900">{ticket.riderName}</div>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4">
-              <div className="text-xs uppercase tracking-wide text-slate-500">Timestamp Issue Received</div>
-              <div className="mt-1 text-sm font-medium text-slate-900">{formatDateTime(ticket.timestampReceived)}</div>
-            </div>
-            <div className={"rounded-2xl border p-4 " + (ticket.status !== "Resolved" && getDurationDays(ticket, nowMs) > 2 ? "border-amber-300 bg-amber-50" : "border-slate-200 bg-white")}>
-              <div className="text-xs uppercase tracking-wide text-slate-500">Duration until resolve</div>
-              <div className="mt-1 text-sm font-medium text-slate-900">{formatDuration(ticket, nowMs)}</div>
-            </div>
-          </div>
-          <div>
-            <h4 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Issue Details</h4>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">{ticket.description || "No additional description provided."}</div>
-          </div>
-          <div>
-            <h4 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Operations Update</h4>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <label className="text-sm">
-                <div className="mb-1.5 font-medium text-slate-700">Status</div>
-                <select value={ticket.status} onChange={(e) => onChange(ticket.id, { status: e.target.value })} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-slate-500">
-                  {STATUS_ORDER.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </label>
-              <label className="text-sm">
-                <div className="mb-1.5 font-medium text-slate-700">Responsible Person</div>
-                <input list="staff-options" value={ticket.responsiblePerson || ""} onChange={(e) => onChange(ticket.id, { responsiblePerson: e.target.value })} placeholder="Leave blank or type a new name" className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-slate-500" />
-              </label>
-              <label className="text-sm">
-                <div className="mb-1.5 font-medium text-slate-700">Escalated to</div>
-                <input list="staff-options" value={ticket.escalatedTo || ""} onChange={(e) => onChange(ticket.id, { escalatedTo: e.target.value })} placeholder="Leave blank or type a team or person" className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-slate-500" />
-              </label>
-              <div className="text-sm">
-                <div className="mb-1.5 font-medium text-slate-700">Acknowledged to Rider's Enquiry</div>
-                <div className="rounded-2xl border border-slate-300 p-3">
-                  <label className="flex items-center gap-3">
-                    <input type="checkbox" checked={ticket.acknowledged} onChange={(e) => onChange(ticket.id, { acknowledged: e.target.checked })} className="h-4 w-4 rounded border-slate-300" />
-                    <span className="text-slate-700">Mark as acknowledged</span>
-                  </label>
-                  <div className="mt-2 text-xs text-slate-500">Timestamp: {formatDateTime(ticket.acknowledgedAt)}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <h4 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Resolution</h4>
-            <label className="text-sm">
-              <div className="mb-1.5 font-medium text-slate-700">Solution</div>
-              <textarea rows={4} value={ticket.solution || ""} onChange={(e) => onChange(ticket.id, { solution: e.target.value })} placeholder="Document what was done, what is pending, or what follow-up is needed" className="w-full rounded-2xl border border-slate-300 bg-white px-3 py-3 outline-none focus:border-slate-500" />
-            </label>
+            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-700">Rider No.</div><input value={ticket.riderNo || ""} onChange={(e) => onChange(ticket.id, { riderNo: e.target.value })} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-slate-500" /></label>
+            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-700">Rider Name</div><input value={ticket.riderName || ""} onChange={(e) => onChange(ticket.id, { riderName: e.target.value })} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-slate-500" /></label>
+            <label className="text-sm md:col-span-2"><div className="mb-1.5 font-medium text-slate-700">Issue</div><input value={ticket.issue || ""} onChange={(e) => onChange(ticket.id, { issue: e.target.value, description: e.target.value })} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-slate-500" /></label>
+            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-700">Timestamp Issue Received</div><input value={ticket.timestampReceived || ""} onChange={(e) => onChange(ticket.id, { timestampReceived: e.target.value })} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-slate-500" /></label>
+            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-700">Acknowledged</div><select value={ticket.acknowledged ? "Done" : ""} onChange={(e) => onChange(ticket.id, { acknowledged: e.target.value === "Done" })} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-slate-500"><option value="">Not yet</option><option value="Done">Done</option></select></label>
+            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-700">Responsible Person</div><input list="staff-options" value={ticket.responsiblePerson || ""} onChange={(e) => onChange(ticket.id, { responsiblePerson: e.target.value })} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-slate-500" /></label>
+            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-700">Escalated to</div><input list="staff-options" value={ticket.escalatedTo || ""} onChange={(e) => onChange(ticket.id, { escalatedTo: e.target.value })} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-slate-500" /></label>
+            <label className="text-sm md:col-span-2"><div className="mb-1.5 font-medium text-slate-700">Solution</div><input value={ticket.solution || ""} onChange={(e) => onChange(ticket.id, { solution: e.target.value })} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-slate-500" /></label>
+            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-700">Status</div><select value={ticket.status} onChange={(e) => onChange(ticket.id, { status: e.target.value })} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-slate-500">{STATUS_ORDER.map((s) => <option key={s} value={s}>{s}</option>)}</select></label>
+            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-700">Timestamp Issue Solved</div><input value={ticket.timestampSolved || ""} onChange={(e) => onChange(ticket.id, { timestampSolved: e.target.value })} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-slate-500" /></label>
+            <label className="text-sm md:col-span-2"><div className="mb-1.5 font-medium text-slate-700">Duration until resolve (Days)</div><input value={ticket.importedDurationLabel || ""} onChange={(e) => onChange(ticket.id, { importedDurationLabel: e.target.value, duration: e.target.value })} placeholder="e.g. 3 days, Same day" className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-slate-500" /></label>
           </div>
           <div>
             <h4 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Internal Notes / Comments</h4>
