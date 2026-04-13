@@ -95,11 +95,33 @@ function sendTicketToSheet(ticket) {
 }
 
 function fetchSheetData() {
-  return fetch(SHEET_CSV_URL + "&_t=" + Date.now())
-    .then(function (res) { return res.text(); })
-    .then(function (text) {
-      var rows = parseCSV(text);
-      rows.shift();
-      return rows.filter(function (r) { return r[0] && r[0].trim(); }).map(sheetRowToTicket);
+  return fetch(SHEET_WRITE_URL)
+    .then(function (res) { return res.json(); })
+    .then(function (tickets) {
+      return tickets.map(function (row, index) {
+        var acknowledged = String(row.acknowledged || "").toLowerCase() === "done";
+        var status = row.status || "Open";
+        if (["Open", "In Progress", "Escalated", "Resolved"].indexOf(status) === -1) status = "Open";
+        return {
+          id: "TKT-" + String(index + 1).padStart(4, "0"),
+          riderNo: row.riderNo || "",
+          riderName: row.riderName || "",
+          issue: row.issue || "",
+          category: "Others",
+          timestampReceived: row.timestampReceived || "",
+          acknowledged: acknowledged,
+          acknowledgedAt: acknowledged ? row.timestampReceived : "",
+          responsiblePerson: row.responsiblePerson || "",
+          escalatedTo: (row.escalatedTo || "").trim(),
+          solution: row.solution || "",
+          status: status,
+          timestampSolved: row.timestampSolved || "",
+          description: row.issue || "",
+          comments: [],
+          lastUpdated: row.timestampSolved || row.timestampReceived || "",
+          importedDurationLabel: row.duration || undefined,
+          importedDurationDays: parseDurationLabelToDays(row.duration),
+        };
+      });
     });
 }
