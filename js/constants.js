@@ -1,10 +1,10 @@
 const STATUS_ORDER = ["Open", "In Progress", "Escalated", "Resolved"];
 
 const STATUS_STYLES = {
-  Open: "bg-slate-100 text-slate-700 border-slate-200",
-  "In Progress": "bg-blue-100 text-blue-700 border-blue-200",
-  Escalated: "bg-orange-100 text-orange-700 border-orange-200",
-  Resolved: "bg-emerald-100 text-emerald-700 border-emerald-200",
+  Open: "bg-slate-50 text-slate-600 border-slate-200",
+  "In Progress": "bg-blue-50 text-blue-600 border-blue-200",
+  Escalated: "bg-amber-50 text-amber-600 border-amber-200",
+  Resolved: "bg-emerald-50 text-emerald-600 border-emerald-200",
 };
 
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbxthGdptwZIe_CpfdRtmjqEM-qZHNyhWK9Ogw7zFVONgKwl6Jv7SmU0QNODXITTFIrVkw/exec";

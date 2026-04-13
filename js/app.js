@@ -89,69 +89,82 @@ function App({ onLogout }) {
     setSelectedTicketId("");
   }
 
-  if (sheetLoading) return <div className="min-h-screen bg-slate-100 flex items-center justify-center text-slate-500">Loading tickets from spreadsheet...</div>;
+  if (sheetLoading) return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-lg font-bold mb-4 animate-pulse">ER</div>
+        <div className="text-sm text-slate-400">Loading tickets...</div>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <div className="flex min-h-screen">
-        <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white p-5 lg:block">
-          <div className="rounded-2xl bg-slate-900 p-4 text-white">
-            <div className="text-xs uppercase tracking-[0.2em] text-slate-300">EasyRider</div>
-            <div className="mt-2 text-xl font-semibold">Rider Support Tracker</div>
-            <div className="mt-1 text-sm text-slate-300">Internal ops dashboard</div>
+        <aside className="hidden w-72 shrink-0 border-r border-slate-200/60 bg-white p-6 lg:flex lg:flex-col">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-sm font-bold shadow-sm">ER</div>
+            <div>
+              <div className="text-sm font-bold text-slate-900">EasyRide</div>
+              <div className="text-xs text-slate-400">Support Tracker</div>
+            </div>
           </div>
-          <div className="mt-6 space-y-2">
-            <button type="button" className="w-full rounded-xl bg-slate-900 px-3 py-2 text-left text-sm text-white">Support Tickets</button>
-            <button type="button" className="w-full rounded-xl px-3 py-2 text-left text-sm text-slate-600 hover:bg-slate-100">Analytics</button>
-            <button type="button" className="w-full rounded-xl px-3 py-2 text-left text-sm text-slate-600 hover:bg-slate-100">Escalations</button>
-            <button type="button" className="w-full rounded-xl px-3 py-2 text-left text-sm text-slate-600 hover:bg-slate-100">Team Queue</button>
+          <nav className="space-y-1">
+            <button type="button" className="w-full flex items-center gap-3 rounded-xl bg-indigo-50 px-3 py-2.5 text-left text-sm font-medium text-indigo-700">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+              Tickets
+            </button>
+          </nav>
+          <div className="mt-8 rounded-xl border border-slate-200/60 bg-slate-50/50 p-4">
+            <div className="text-xs font-medium uppercase tracking-wide text-slate-400 mb-2">Staff Filter</div>
+            <input value={currentUser} onChange={(e) => setCurrentUser(e.target.value)} placeholder="Your name" className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-400 transition" />
+            <div className="mt-2 text-xs text-slate-400">For "My tickets" filter</div>
           </div>
-          <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <div className="text-xs uppercase tracking-wide text-slate-500">Current staff filter</div>
-            <input value={currentUser} onChange={(e) => setCurrentUser(e.target.value)} placeholder="Type your name" className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500" />
-            <div className="mt-2 text-xs text-slate-500">Used for the My tickets quick filter.</div>
+          <div className="mt-auto pt-6">
+            <button type="button" onClick={onLogout} className="w-full flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+              Sign Out
+            </button>
           </div>
-          <button type="button" onClick={onLogout} className="mt-6 w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-500 hover:bg-slate-100">Sign Out</button>
         </aside>
 
-        <main className="flex-1 p-4 md:p-6">
+        <main className="flex-1 p-5 md:p-8">
           <div className="mx-auto max-w-[1600px]">
-            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
               <div>
-                <div className="text-sm font-medium text-slate-500">Operations / Rider Support</div>
-                <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">Ticket dashboard</h1>
-                <p className="mt-1 text-sm text-slate-500">Track rider issues, ownership, escalation, acknowledgement, and resolution timing.</p>
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900">Ticket Dashboard</h1>
+                <p className="mt-1 text-sm text-slate-400">Track rider issues, escalation, and resolution.</p>
               </div>
-              <div className="flex flex-wrap gap-3">
-                <button type="button" onClick={() => setQuickFilter("unresolved")} className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Unresolved only</button>
-                <button type="button" onClick={() => setCreateOpen(true)} className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800">Create Ticket</button>
+              <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={() => setQuickFilter("unresolved")} className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300 hover:shadow-sm transition">Unresolved</button>
+                <button type="button" onClick={() => setCreateOpen(true)} className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:shadow-md hover:brightness-110 transition-all">+ New Ticket</button>
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
-              <StatCard title="Total Tickets" value={summary.total} hint="All tickets in tracker" />
-              <StatCard title="Open" value={summary.open} hint="Awaiting action" />
-              <StatCard title="Escalated" value={summary.escalated} hint="Needs escalation" />
-              <StatCard title="Resolved" value={summary.resolved} hint="Closed with solution recorded" />
-              <StatCard title="Avg Resolution" value={summary.avgResolutionDays.toFixed(1) + "d"} hint="Based on resolved tickets" />
+            <div className="mt-6 grid grid-cols-2 gap-3 xl:grid-cols-5">
+              <StatCard title="Total" value={summary.total} hint="All tickets" />
+              <StatCard title="Open" value={summary.open} hint="Awaiting action" accent="border-slate-200/60 bg-white" />
+              <StatCard title="Escalated" value={summary.escalated} hint="Needs attention" accent="border-amber-200/60 bg-amber-50/30" />
+              <StatCard title="Resolved" value={summary.resolved} hint="Completed" accent="border-emerald-200/60 bg-emerald-50/30" />
+              <StatCard title="Avg Resolution" value={summary.avgResolutionDays.toFixed(1) + "d"} hint="Resolution time" accent="border-indigo-200/60 bg-indigo-50/30" />
             </div>
 
             <div className="mt-6">
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-4">Status Distribution</div>
-                <div className="flex items-end justify-around gap-3" style={{ height: "140px" }}>
+              <div className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm">
+                <div className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-4">Status Overview</div>
+                <div className="flex items-end justify-around gap-4" style={{ height: "120px" }}>
                   {(() => {
                     const counts = { Open: 0, "In Progress": 0, Escalated: 0, Resolved: 0 };
                     tickets.forEach((t) => { if (counts[t.status] !== undefined) counts[t.status]++; });
                     const max = Math.max(...Object.values(counts), 1);
-                    const colors = { Open: "bg-slate-400", "In Progress": "bg-blue-400", Escalated: "bg-orange-400", Resolved: "bg-emerald-400" };
+                    const colors = { Open: "from-slate-300 to-slate-400", "In Progress": "from-blue-400 to-blue-500", Escalated: "from-amber-400 to-orange-500", Resolved: "from-emerald-400 to-emerald-500" };
                     return STATUS_ORDER.map((s) => (
-                      <div key={s} className="flex flex-col items-center gap-1 flex-1">
-                        <div className="text-sm font-bold text-slate-800">{counts[s]}</div>
-                        <div className="w-full max-w-[48px] rounded-t-lg transition-all" style={{ height: Math.max(counts[s] / max * 100, 4) + "px" }}>
-                          <div className={colors[s] + " w-full h-full rounded-t-lg"}></div>
+                      <div key={s} className="flex flex-col items-center gap-1.5 flex-1">
+                        <div className="text-sm font-bold text-slate-700">{counts[s]}</div>
+                        <div className="w-full max-w-[40px] rounded-lg overflow-hidden" style={{ height: Math.max(counts[s] / max * 80, 4) + "px" }}>
+                          <div className={"w-full h-full rounded-lg bg-gradient-to-t " + colors[s]}></div>
                         </div>
-                        <div className="text-[10px] text-slate-500 text-center mt-1 leading-tight">{s}</div>
+                        <div className="text-[10px] font-medium text-slate-400 text-center leading-tight">{s}</div>
                       </div>
                     ));
                   })()}
@@ -159,58 +172,58 @@ function App({ onLogout }) {
               </div>
             </div>
 
-            <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                <div className="grid flex-1 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-                  <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by rider, ticket ID, issue, assignee..." className="rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-slate-500 xl:col-span-2" />
-                  <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-slate-500">
-                    <option value="All">All Statuses</option>
-                    {STATUS_ORDER.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                  <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-slate-500">
-                    <option value="timestamp">Sort by Timestamp</option>
-                    <option value="status">Sort by Status</option>
-                    <option value="duration">Sort by Duration</option>
-                  </select>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {[{ key: "all", label: "All" }, { key: "unresolved", label: "Unresolved" }, { key: "escalated", label: "Escalated" }, { key: "my", label: "My tickets" }].map((item) => (
-                    <button key={item.key} type="button" onClick={() => setQuickFilter(item.key)} className={"rounded-xl px-3 py-2 text-sm font-medium " + (quickFilter === item.key ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200")}>{item.label}</button>
-                  ))}
+            <div className="mt-6 rounded-2xl border border-slate-200/60 bg-white shadow-sm">
+              <div className="p-4 border-b border-slate-100">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="flex flex-1 gap-3 flex-wrap">
+                    <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search tickets..." className="flex-1 min-w-[200px] rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition" />
+                    <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2.5 text-sm outline-none focus:border-indigo-400 transition">
+                      <option value="All">All Statuses</option>
+                      {STATUS_ORDER.map((s) => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                    <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2.5 text-sm outline-none focus:border-indigo-400 transition">
+                      <option value="timestamp">Newest first</option>
+                      <option value="status">By Status</option>
+                      <option value="duration">By Duration</option>
+                    </select>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[{ key: "all", label: "All" }, { key: "unresolved", label: "Unresolved" }, { key: "escalated", label: "Escalated" }, { key: "my", label: "My tickets" }].map((item) => (
+                      <button key={item.key} type="button" onClick={() => setQuickFilter(item.key)} className={"rounded-lg px-3 py-1.5 text-xs font-semibold transition " + (quickFilter === item.key ? "bg-indigo-500 text-white shadow-sm" : "bg-slate-100 text-slate-500 hover:bg-slate-200")}>{item.label}</button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200">
-                <div className="overflow-x-auto">
-                  <table className="min-w-[1400px] w-full text-sm">
-                    <thead className="bg-slate-50 text-left text-slate-600">
-                      <tr>
-                        {["Rider No.", "Rider Name", "Issue", "Timestamp Issue Received", "Acknowledged", "Responsible Person", "Escalated to", "Solution", "Status", "Timestamp Issue Solved", "Duration until resolve"].map((col) => <th key={col} className="whitespace-nowrap border-b border-slate-200 px-4 py-3 font-medium">{col}</th>)}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredTickets.length ? filteredTickets.map((ticket) => {
-                        const warningLevel = getWarningLevel(ticket, nowMs);
-                        const rowTone = warningLevel === "critical" ? "bg-rose-50/80" : warningLevel === "warning" ? "bg-amber-50/70" : selectedTicketId === ticket.id ? "bg-slate-50" : "bg-white";
-                        return (
-                          <tr key={ticket.id} onClick={() => setSelectedTicketId(ticket.id)} className={"cursor-pointer border-b border-slate-200 transition hover:bg-slate-50 " + rowTone}>
-                            <td className="whitespace-nowrap px-4 py-3 font-medium text-slate-900">{ticket.riderNo}</td>
-                            <td className="whitespace-nowrap px-4 py-3">{ticket.riderName}</td>
-                            <td className="max-w-[280px] px-4 py-3"><div className="font-medium text-slate-900">{ticket.issue}</div><div className="mt-1 text-xs text-slate-500">{ticket.id}</div></td>
-                            <td className="whitespace-nowrap px-4 py-3">{formatDateTime(ticket.timestampReceived)}</td>
-                            <td className="px-4 py-3"><div className="font-medium text-slate-900">{ticket.acknowledged ? "Yes" : "No"}</div><div className="mt-1 whitespace-nowrap text-xs text-slate-500">{formatDateTime(ticket.acknowledgedAt)}</div></td>
-                            <td className="whitespace-nowrap px-4 py-3">{ticket.responsiblePerson || "\u2014"}</td>
-                            <td className="whitespace-nowrap px-4 py-3">{ticket.escalatedTo || "\u2014"}</td>
-                            <td className="max-w-[280px] px-4 py-3 text-slate-600">{ticket.solution || "\u2014"}</td>
-                            <td className="whitespace-nowrap px-4 py-3"><Badge tone={STATUS_STYLES[ticket.status]}>{ticket.status}</Badge></td>
-                            <td className="whitespace-nowrap px-4 py-3">{formatDateTime(ticket.timestampSolved)}</td>
-                            <td className="whitespace-nowrap px-4 py-3">{formatDuration(ticket, nowMs)}</td>
-                          </tr>
-                        );
-                      }) : <tr><td colSpan={11} className="px-4 py-12 text-center text-sm text-slate-500">No tickets match the current filters.</td></tr>}
-                    </tbody>
-                  </table>
-                </div>
+              <div className="overflow-x-auto">
+                <table className="min-w-[1400px] w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-100">
+                      {["Rider No.", "Rider Name", "Issue", "Timestamp Issue Received", "Acknowledged", "Responsible Person", "Escalated to", "Solution", "Status", "Timestamp Issue Solved", "Duration until resolve"].map((col) => <th key={col} className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">{col}</th>)}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredTickets.length ? filteredTickets.map((ticket) => {
+                      const warningLevel = getWarningLevel(ticket, nowMs);
+                      const rowTone = warningLevel === "critical" ? "bg-rose-50/50" : warningLevel === "warning" ? "bg-amber-50/30" : "";
+                      return (
+                        <tr key={ticket.id} onClick={() => setSelectedTicketId(ticket.id)} className={"cursor-pointer border-b border-slate-50 transition hover:bg-indigo-50/30 " + rowTone}>
+                          <td className="whitespace-nowrap px-4 py-3.5 font-medium text-slate-900">{ticket.riderNo}</td>
+                          <td className="whitespace-nowrap px-4 py-3.5 text-slate-600">{ticket.riderName}</td>
+                          <td className="max-w-[280px] px-4 py-3.5"><div className="font-medium text-slate-800 truncate">{ticket.issue}</div><div className="mt-0.5 text-xs text-slate-400">{ticket.id}</div></td>
+                          <td className="whitespace-nowrap px-4 py-3.5 text-slate-500">{formatDateTime(ticket.timestampReceived)}</td>
+                          <td className="px-4 py-3.5"><Badge tone={ticket.acknowledged ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-slate-50 text-slate-400 border-slate-200"}>{ticket.acknowledged ? "Done" : "No"}</Badge></td>
+                          <td className="whitespace-nowrap px-4 py-3.5 text-slate-600">{ticket.responsiblePerson || "\u2014"}</td>
+                          <td className="whitespace-nowrap px-4 py-3.5 text-slate-600">{ticket.escalatedTo || "\u2014"}</td>
+                          <td className="max-w-[280px] px-4 py-3.5 text-slate-500 truncate">{ticket.solution || "\u2014"}</td>
+                          <td className="whitespace-nowrap px-4 py-3.5"><Badge tone={STATUS_STYLES[ticket.status]}>{ticket.status}</Badge></td>
+                          <td className="whitespace-nowrap px-4 py-3.5 text-slate-500">{formatDateTime(ticket.timestampSolved)}</td>
+                          <td className="whitespace-nowrap px-4 py-3.5 text-slate-500">{formatDuration(ticket, nowMs)}</td>
+                        </tr>
+                      );
+                    }) : <tr><td colSpan={11} className="px-4 py-16 text-center text-sm text-slate-400">No tickets match the current filters.</td></tr>}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -231,7 +244,7 @@ function Root() {
     return auth.onAuthStateChanged((u) => { setUser(u); setChecking(false); });
   }, []);
 
-  if (checking) return <div className="min-h-screen bg-slate-100 flex items-center justify-center text-slate-500">Loading...</div>;
+  if (checking) return <div className="min-h-screen bg-slate-50 flex items-center justify-center text-slate-400">Loading...</div>;
   if (!user) return <LoginPage onLogin={(u) => setUser(u)} />;
   return <App onLogout={() => auth.signOut()} />;
 }
