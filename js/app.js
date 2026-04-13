@@ -70,7 +70,7 @@ function App({ onLogout }) {
 
   function createTicket(form) {
     const now = new Date().toISOString();
-    const newTicket = { id: makeId(), riderNo: form.riderNo, riderName: form.riderName, issue: form.issue, category: "Others", timestampReceived: form.timestampReceived || now, acknowledged: form.acknowledged || "", acknowledgedAt: form.acknowledged === "Done" ? now : "", responsiblePerson: form.responsiblePerson, escalatedTo: form.escalatedTo, solution: form.solution || "", status: form.status, timestampSolved: form.timestampSolved || "", description: form.issue, comments: [], lastUpdated: now, importedDurationLabel: form.duration || undefined, importedDurationDays: parseDurationLabelToDays(form.duration), duration: form.duration || "" };
+    const newTicket = { id: makeId(), riderNo: form.riderNo, riderName: form.riderName, issue: form.issue, timestampReceived: form.timestampReceived || now, acknowledged: form.acknowledged || "", acknowledgedAt: form.acknowledged === "Done" ? now : "", responsiblePerson: form.responsiblePerson, escalatedTo: form.escalatedTo, solution: form.solution || "", status: form.status, timestampSolved: form.timestampSolved || "", description: form.issue, comments: [], lastUpdated: now, importedDurationLabel: form.duration || undefined, importedDurationDays: parseDurationLabelToDays(form.duration), duration: form.duration || "" };
     setTickets((prev) => [newTicket].concat(prev));
     setSelectedTicketId(newTicket.id);
     sendTicketToSheet(newTicket);
@@ -123,7 +123,7 @@ function App({ onLogout }) {
               <StatCard title="Avg Resolution" value={summary.avgResolutionDays.toFixed(1) + "d"} hint="Based on resolved tickets" />
             </div>
 
-            <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="mt-6">
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-4">Status Distribution</div>
                 <div className="flex items-end justify-around gap-3" style={{ height: "140px" }}>
@@ -139,26 +139,6 @@ function App({ onLogout }) {
                           <div className={colors[s] + " w-full h-full rounded-t-lg"}></div>
                         </div>
                         <div className="text-[10px] text-slate-500 text-center mt-1 leading-tight">{s}</div>
-                      </div>
-                    ));
-                  })()}
-                </div>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-4">By Category</div>
-                <div className="flex items-end justify-around gap-3" style={{ height: "140px" }}>
-                  {(() => {
-                    const counts = {};
-                    tickets.forEach((t) => { counts[t.category] = (counts[t.category] || 0) + 1; });
-                    const max = Math.max(...Object.values(counts), 1);
-                    const catColors = { Account: "bg-blue-500", Payment: "bg-emerald-500", "App Issue": "bg-purple-500", Vehicle: "bg-amber-500", Others: "bg-slate-400" };
-                    return CATEGORIES.filter((c) => counts[c]).map((c) => (
-                      <div key={c} className="flex flex-col items-center gap-1 flex-1">
-                        <div className="text-sm font-bold text-slate-800">{counts[c]}</div>
-                        <div className="w-full max-w-[48px] rounded-t-lg transition-all" style={{ height: Math.max(counts[c] / max * 100, 4) + "px" }}>
-                          <div className={(catColors[c] || "bg-slate-400") + " w-full h-full rounded-t-lg"}></div>
-                        </div>
-                        <div className="text-[10px] text-slate-500 text-center mt-1 leading-tight">{c}</div>
                       </div>
                     ));
                   })()}
@@ -203,7 +183,7 @@ function App({ onLogout }) {
                           <tr key={ticket.id} onClick={() => setSelectedTicketId(ticket.id)} className={"cursor-pointer border-b border-slate-200 transition hover:bg-slate-50 " + rowTone}>
                             <td className="whitespace-nowrap px-4 py-3 font-medium text-slate-900">{ticket.riderNo}</td>
                             <td className="whitespace-nowrap px-4 py-3">{ticket.riderName}</td>
-                            <td className="max-w-[280px] px-4 py-3"><div className="font-medium text-slate-900">{ticket.issue}</div><div className="mt-1 text-xs text-slate-500">{ticket.id + " \u2022 " + ticket.category}</div></td>
+                            <td className="max-w-[280px] px-4 py-3"><div className="font-medium text-slate-900">{ticket.issue}</div><div className="mt-1 text-xs text-slate-500">{ticket.id}</div></td>
                             <td className="whitespace-nowrap px-4 py-3">{formatDateTime(ticket.timestampReceived)}</td>
                             <td className="px-4 py-3"><div className="font-medium text-slate-900">{ticket.acknowledged ? "Yes" : "No"}</div><div className="mt-1 whitespace-nowrap text-xs text-slate-500">{formatDateTime(ticket.acknowledgedAt)}</div></td>
                             <td className="whitespace-nowrap px-4 py-3">{ticket.responsiblePerson || "\u2014"}</td>

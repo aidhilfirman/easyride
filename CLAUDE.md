@@ -14,7 +14,7 @@ Internal ops dashboard for tracking rider support tickets. Deployed at https://e
 ```
 index.html              — HTML shell, loads all scripts (edit rarely)
 js/firebase-config.js   — Firebase project credentials (plain JS)
-js/constants.js         — Status/category lists, ticket seed data (IMPORTED_ROWS)
+js/constants.js         — Status list, Google Sheet URL, fetch/send functions
 js/utils.js             — Date formatting, duration calc, ticket builder
 js/login.js             — LoginPage component (register + sign in via Firebase Auth)
 js/components.js        — StatCard, Badge, TicketDrawer, CreateTicketModal
@@ -25,7 +25,7 @@ js/app.js               — Main App component, Root wrapper, state management, 
 
 - **Change login/register page** → `js/login.js`
 - **Change Firebase credentials** → `js/firebase-config.js`
-- **Add/change ticket data** → `js/constants.js`
+- **Change sheet URL or ticket send/fetch** → `js/constants.js`
 - **Change date/duration logic** → `js/utils.js`
 - **Change a form, modal, or card** → `js/components.js`
 - **Change dashboard layout, filters, charts** → `js/app.js`
