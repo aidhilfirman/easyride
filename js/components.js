@@ -14,7 +14,7 @@ function Badge({ children, tone }) {
   return <span className={"inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium " + tone}>{children}</span>;
 }
 
-function TicketDrawer({ ticket, onClose, onChange, onAddComment, staffOptions, currentUser, nowMs }) {
+function TicketDrawer({ ticket, onClose, onChange, onSave, onDelete, onAddComment, staffOptions, currentUser, nowMs }) {
   const [commentText, setCommentText] = useState("");
   useEffect(() => { setCommentText(""); }, [ticket ? ticket.id : ""]);
   if (!ticket) return null;
@@ -114,6 +114,10 @@ function TicketDrawer({ ticket, onClose, onChange, onAddComment, staffOptions, c
               </div>
             </div>
           </div>
+        </div>
+        <div className="border-t border-slate-200 px-6 py-4 flex items-center justify-between gap-3">
+          <button type="button" onClick={() => { if (confirm("Delete this ticket? This will also remove it from the spreadsheet.")) onDelete(ticket.id); }} className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-100">Delete</button>
+          <button type="button" onClick={() => { onSave(ticket.id); onClose(); }} className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800">Save to Spreadsheet</button>
         </div>
         <datalist id="staff-options">{staffOptions.map((name) => <option key={name} value={name} />)}</datalist>
       </div>

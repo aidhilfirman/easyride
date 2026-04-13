@@ -9,23 +9,44 @@ const STATUS_STYLES = {
 
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbxthGdptwZIe_CpfdRtmjqEM-qZHNyhWK9Ogw7zFVONgKwl6Jv7SmU0QNODXITTFIrVkw/exec";
 
+function ticketToSheetData(ticket) {
+  return {
+    riderNo: ticket.riderNo,
+    riderName: ticket.riderName,
+    issue: ticket.issue,
+    timestampReceived: ticket.timestampReceived || "",
+    acknowledged: ticket.acknowledged || "",
+    responsiblePerson: ticket.responsiblePerson || "",
+    escalatedTo: ticket.escalatedTo || "",
+    solution: ticket.solution || "",
+    status: ticket.status,
+    timestampSolved: ticket.timestampSolved || "",
+    duration: ticket.duration || ""
+  };
+}
+
 function sendTicketToSheet(ticket) {
   return fetch(SHEET_URL, {
     method: "POST",
-    body: JSON.stringify({
-      riderNo: ticket.riderNo,
-      riderName: ticket.riderName,
-      issue: ticket.issue,
-      timestampReceived: ticket.timestampReceived || "",
-      acknowledged: ticket.acknowledged || "",
-      responsiblePerson: ticket.responsiblePerson,
-      escalatedTo: ticket.escalatedTo,
-      solution: ticket.solution || "",
-      status: ticket.status,
-      timestampSolved: ticket.timestampSolved || "",
-      duration: ticket.duration || ""
-    }),
+    body: JSON.stringify(ticketToSheetData(ticket)),
   }).catch(function (err) { console.error("Failed to write to sheet:", err); });
+}
+
+function updateTicketInSheet(ticket) {
+  var data = ticketToSheetData(ticket);
+  data.action = "update";
+  data.row = ticket.sheetRow;
+  return fetch(SHEET_URL, {
+    method: "POST",
+    body: JSON.stringify(data),
+  }).catch(function (err) { console.error("Failed to update sheet:", err); });
+}
+
+function deleteTicketFromSheet(sheetRow) {
+  return fetch(SHEET_URL, {
+    method: "POST",
+    body: JSON.stringify({ action: "delete", row: sheetRow }),
+  }).catch(function (err) { console.error("Failed to delete from sheet:", err); });
 }
 
 function fetchSheetData() {
@@ -37,6 +58,7 @@ function fetchSheetData() {
         var status = row.status || "Open";
         if (["Open", "In Progress", "Escalated", "Resolved"].indexOf(status) === -1) status = "Open";
         return {
+          sheetRow: index,
           id: "TKT-" + String(index + 1).padStart(4, "0"),
           riderNo: row.riderNo || "",
           riderName: row.riderName || "",

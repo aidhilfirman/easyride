@@ -76,6 +76,19 @@ function App({ onLogout }) {
     sendTicketToSheet(newTicket);
   }
 
+  function saveTicketToSheet(ticketId) {
+    const ticket = tickets.find((t) => t.id === ticketId);
+    if (ticket && ticket.sheetRow !== undefined) updateTicketInSheet(ticket);
+  }
+
+  function deleteTicket(ticketId) {
+    const ticket = tickets.find((t) => t.id === ticketId);
+    if (!ticket) return;
+    if (ticket.sheetRow !== undefined) deleteTicketFromSheet(ticket.sheetRow);
+    setTickets((prev) => prev.filter((t) => t.id !== ticketId));
+    setSelectedTicketId("");
+  }
+
   if (sheetLoading) return <div className="min-h-screen bg-slate-100 flex items-center justify-center text-slate-500">Loading tickets from spreadsheet...</div>;
 
   return (
@@ -204,7 +217,7 @@ function App({ onLogout }) {
         </main>
       </div>
 
-      <TicketDrawer ticket={selectedTicket} onClose={() => setSelectedTicketId("")} onChange={updateTicket} onAddComment={addComment} staffOptions={staffOptions} currentUser={currentUser} nowMs={nowMs} />
+      <TicketDrawer ticket={selectedTicket} onClose={() => setSelectedTicketId("")} onChange={updateTicket} onSave={saveTicketToSheet} onDelete={deleteTicket} onAddComment={addComment} staffOptions={staffOptions} currentUser={currentUser} nowMs={nowMs} />
       <CreateTicketModal open={createOpen} onClose={() => setCreateOpen(false)} onCreate={createTicket} staffOptions={staffOptions} />
     </div>
   );
