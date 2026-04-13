@@ -83,7 +83,7 @@ function sendTicketToSheet(ticket) {
       riderName: ticket.riderName,
       issue: ticket.issue,
       timestampReceived: new Date().toLocaleString("en-GB", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true }),
-      acknowledged: ticket.acknowledged ? "Done" : "",
+      acknowledged: ticket.acknowledged || "",
       responsiblePerson: ticket.responsiblePerson,
       escalatedTo: ticket.escalatedTo,
       solution: ticket.solution,

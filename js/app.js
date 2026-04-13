@@ -70,7 +70,7 @@ function App({ onLogout }) {
 
   function createTicket(form) {
     const now = new Date().toISOString();
-    const newTicket = { id: makeId(), riderNo: form.riderNo, riderName: form.riderName, issue: form.issue, category: form.category, timestampReceived: now, acknowledged: false, acknowledgedAt: "", responsiblePerson: form.responsiblePerson, escalatedTo: form.escalatedTo, solution: "", status: form.status, timestampSolved: form.status === "Resolved" ? now : "", description: form.description, comments: [], lastUpdated: now, importedDurationLabel: undefined, importedDurationDays: null };
+    const newTicket = { id: makeId(), riderNo: form.riderNo, riderName: form.riderName, issue: form.issue, category: "Others", timestampReceived: now, acknowledged: form.acknowledged || "", acknowledgedAt: form.acknowledged === "Done" ? now : "", responsiblePerson: form.responsiblePerson, escalatedTo: form.escalatedTo, solution: form.solution || "", status: form.status, timestampSolved: form.status === "Resolved" ? now : "", description: form.issue, comments: [], lastUpdated: now, importedDurationLabel: undefined, importedDurationDays: null };
     setTickets((prev) => [newTicket].concat(prev));
     setSelectedTicketId(newTicket.id);
     sendTicketToSheet(newTicket);
