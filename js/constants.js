@@ -71,9 +71,7 @@ function fetchSheetData() {
           solution: row.solution || "",
           status: status,
           timestampSolved: row.timestampSolved || "",
-          description: row.issue || "",
           comments: [],
-          lastUpdated: row.timestampSolved || row.timestampReceived || "",
           importedDurationLabel: row.duration || undefined,
           importedDurationDays: parseDurationLabelToDays(row.duration),
         };

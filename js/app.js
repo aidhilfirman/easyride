@@ -37,7 +37,7 @@ function App({ onLogout }) {
 
   const filteredTickets = useMemo(() => {
     let list = tickets.slice();
-    if (search.trim()) { const q = search.toLowerCase(); list = list.filter((t) => [t.id, t.riderNo, t.riderName, t.issue, t.responsiblePerson, t.escalatedTo, t.solution, t.description].filter(Boolean).some((f) => String(f).toLowerCase().includes(q))); }
+    if (search.trim()) { const q = search.toLowerCase(); list = list.filter((t) => [t.id, t.riderNo, t.riderName, t.issue, t.responsiblePerson, t.escalatedTo, t.solution].filter(Boolean).some((f) => String(f).toLowerCase().includes(q))); }
     if (statusFilter !== "All") list = list.filter((t) => t.status === statusFilter);
     if (quickFilter === "unresolved") list = list.filter((t) => t.status !== "Resolved");
     if (quickFilter === "escalated") list = list.filter((t) => t.status === "Escalated");
@@ -57,7 +57,7 @@ function App({ onLogout }) {
   function updateTicket(ticketId, changes) {
     setTickets((prev) => prev.map((t) => {
       if (t.id !== ticketId) return t;
-      const next = { ...t, ...changes, lastUpdated: new Date().toISOString() };
+      const next = { ...t, ...changes };
       if (Object.prototype.hasOwnProperty.call(changes, "acknowledged")) { next.acknowledgedAt = changes.acknowledged ? t.acknowledgedAt || new Date().toISOString() : ""; }
       if (Object.prototype.hasOwnProperty.call(changes, "status")) { next.importedDurationLabel = undefined; next.importedDurationDays = null; if (changes.status === "Resolved") { next.timestampSolved = t.timestampSolved || new Date().toISOString(); } else if (t.status === "Resolved" && changes.status !== "Resolved") { next.timestampSolved = ""; } }
       return next;
@@ -65,12 +65,12 @@ function App({ onLogout }) {
   }
 
   function addComment(ticketId, comment) {
-    setTickets((prev) => prev.map((t) => t.id === ticketId ? { ...t, comments: t.comments.concat(comment), lastUpdated: new Date().toISOString() } : t));
+    setTickets((prev) => prev.map((t) => t.id === ticketId ? { ...t, comments: t.comments.concat(comment) } : t));
   }
 
   function createTicket(form) {
     const now = new Date().toISOString();
-    const newTicket = { id: makeId(), riderNo: form.riderNo, riderName: form.riderName, issue: form.issue, timestampReceived: form.timestampReceived || now, acknowledged: form.acknowledged || "", acknowledgedAt: form.acknowledged === "Done" ? now : "", responsiblePerson: form.responsiblePerson, escalatedTo: form.escalatedTo, solution: form.solution || "", status: form.status, timestampSolved: form.timestampSolved || "", description: form.issue, comments: [], lastUpdated: now, importedDurationLabel: form.duration || undefined, importedDurationDays: parseDurationLabelToDays(form.duration), duration: form.duration || "" };
+    const newTicket = { id: makeId(), riderNo: form.riderNo, riderName: form.riderName, issue: form.issue, timestampReceived: form.timestampReceived || now, acknowledged: form.acknowledged || "", acknowledgedAt: form.acknowledged === "Done" ? now : "", responsiblePerson: form.responsiblePerson, escalatedTo: form.escalatedTo, solution: form.solution || "", status: form.status, timestampSolved: form.timestampSolved || "", comments: [], importedDurationLabel: form.duration || undefined, importedDurationDays: parseDurationLabelToDays(form.duration), duration: form.duration || "" };
     setTickets((prev) => [newTicket].concat(prev));
     setSelectedTicketId(newTicket.id);
     sendTicketToSheet(newTicket);
