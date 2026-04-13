@@ -1,4 +1,4 @@
-function App() {
+function App({ onLogout }) {
   const [tickets, setTickets] = useState(INITIAL_TICKETS);
   const [selectedTicketId, setSelectedTicketId] = useState(INITIAL_TICKETS[0] ? INITIAL_TICKETS[0].id : "");
   const [search, setSearch] = useState("");
@@ -87,6 +87,7 @@ function App() {
             <input value={currentUser} onChange={(e) => setCurrentUser(e.target.value)} placeholder="Type your name" className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500" />
             <div className="mt-2 text-xs text-slate-500">Used for the My tickets quick filter.</div>
           </div>
+          <button type="button" onClick={onLogout} className="mt-6 w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-500 hover:bg-slate-100">Sign Out</button>
         </aside>
 
         <main className="flex-1 p-4 md:p-6">
@@ -228,7 +229,7 @@ function Root() {
 
   if (checking) return <div className="min-h-screen bg-slate-100 flex items-center justify-center text-slate-500">Loading...</div>;
   if (!user) return <LoginPage onLogin={(u) => setUser(u)} />;
-  return <App />;
+  return <App onLogout={() => auth.signOut()} />;
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(<Root />);
