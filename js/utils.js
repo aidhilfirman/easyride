@@ -55,4 +55,3 @@ function getWarningLevel(ticket, nowMs) {
 function makeId() {
   return "TKT-" + Math.floor(1000 + Math.random() * 9000);
 }
-

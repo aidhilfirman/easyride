@@ -7,6 +7,8 @@ Internal ops dashboard for tracking rider support tickets. Deployed at https://e
 - React 18 (loaded via CDN, no build step)
 - Tailwind CSS (CDN)
 - Babel standalone (in-browser JSX transpilation)
+- Firebase Auth (email/password)
+- Google Sheets backend via Apps Script
 - Static hosting on Vercel
 
 ## File Map
@@ -14,10 +16,10 @@ Internal ops dashboard for tracking rider support tickets. Deployed at https://e
 ```
 index.html              — HTML shell, loads all scripts (edit rarely)
 js/firebase-config.js   — Firebase project credentials (plain JS)
-js/constants.js         — Status list, Google Sheet URL, fetch/send functions
-js/utils.js             — Date formatting, duration calc, ticket builder
+js/constants.js         — Status list, staff list, Sheet URL, fetch/send with retry
+js/utils.js             — Date formatting, duration calc, debounce, ticket ID generator
 js/login.js             — LoginPage component (register + sign in via Firebase Auth)
-js/components.js        — StatCard, Badge, TicketDrawer, CreateTicketModal
+js/components.js        — ErrorBoundary, StatCard, Badge, Toasts, TicketDrawer, CreateTicketModal
 js/app.js               — Main App component, Root wrapper, state management, render
 ```
 
@@ -25,10 +27,10 @@ js/app.js               — Main App component, Root wrapper, state management, 
 
 - **Change login/register page** → `js/login.js`
 - **Change Firebase credentials** → `js/firebase-config.js`
-- **Change sheet URL or ticket send/fetch** → `js/constants.js`
+- **Change sheet URL, staff list, or ticket send/fetch** → `js/constants.js`
 - **Change date/duration logic** → `js/utils.js`
-- **Change a form, modal, or card** → `js/components.js`
-- **Change dashboard layout, filters, charts** → `js/app.js`
+- **Change a form, modal, drawer, or card** → `js/components.js`
+- **Change dashboard layout, filters, table, charts** → `js/app.js`
 - **Add new CDN libraries** → `index.html`
 
 ## Conventions
@@ -37,4 +39,16 @@ js/app.js               — Main App component, Root wrapper, state management, 
 - All state lives in the App component (js/app.js)
 - No build step — files are served as-is by Vercel
 - `constants.js` and `utils.js` are plain JS (no JSX)
-- `components.js` and `app.js` use JSX (loaded as `type="text/babel"`)
+- `login.js`, `components.js`, and `app.js` use JSX (loaded as `type="text/babel"`)
+- Staff names defined in STAFF_LIST constant (js/constants.js)
+- Sheet API calls use sheetFetch() with automatic retry (3 attempts, exponential backoff)
+- Toast notifications for save/delete feedback
+- ErrorBoundary wraps App to prevent white-screen crashes
+
+## UI Architecture
+
+- **Compact table** (desktop): 5 columns — Rider, Issue, Status, Assigned, Duration
+- **Mobile cards**: responsive card layout below md breakpoint
+- **Drawer**: click any row to open slide-out panel with ALL fields + internal notes
+- **SLA indicators**: left border color (rose=critical >3d, amber=warning >2d)
+- **Debounced search**: 300ms delay for smooth filtering
