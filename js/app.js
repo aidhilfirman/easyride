@@ -1,4 +1,5 @@
 function App({ onLogout }) {
+  const [page, setPage] = useState("home");
   const [tickets, setTickets] = useState([]);
   const [selectedTicketId, setSelectedTicketId] = useState("");
   const [sheetLoading, setSheetLoading] = useState(true);
@@ -36,6 +37,22 @@ function App({ onLogout }) {
     setTimeout(function () { setToasts(function (prev) { return prev.filter(function (t) { return t.id !== id; }); }); }, 3000);
   }
 
+  function goHome() {
+    setPage("home");
+    setSearch("");
+    setDebouncedSearch("");
+    setStatusFilter("All");
+    setQuickFilter("all");
+    setSortBy("timestamp");
+    setSelectedTicketId("");
+  }
+
+  function openDashboard(options) {
+    if (options && options.quickFilter) setQuickFilter(options.quickFilter);
+    if (options && options.createOpen) setCreateOpen(true);
+    setPage("dashboard");
+  }
+
   var staffOptions = useMemo(function () {
     var names = new Set(STAFF_LIST);
     tickets.forEach(function (t) {
@@ -53,7 +70,8 @@ function App({ onLogout }) {
     var resolved = tickets.filter(function (t) { return t.status === "Resolved"; }).length;
     var resolvedList = tickets.filter(function (t) { return t.status === "Resolved"; });
     var avgDays = resolvedList.length ? resolvedList.reduce(function (sum, t) { return sum + getDurationDays(t, nowMs); }, 0) / resolvedList.length : 0;
-    return { total: total, open: open, inProgress: inProgress, escalated: escalated, resolved: resolved, avgDays: avgDays };
+    var unresolved = total - resolved;
+    return { total: total, open: open, inProgress: inProgress, escalated: escalated, resolved: resolved, avgDays: avgDays, unresolved: unresolved };
   }, [tickets, nowMs]);
 
   var filteredTickets = useMemo(function () {
@@ -152,7 +170,7 @@ function App({ onLogout }) {
   if (sheetLoading) return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center">
       <div className="text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-lg font-bold mb-4 animate-pulse">ER</div>
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-xl font-bold mb-4 animate-pulse shadow-lg shadow-indigo-500/20">ER</div>
         <div className="text-sm text-slate-400">Loading tickets...</div>
       </div>
     </div>
@@ -170,7 +188,102 @@ function App({ onLogout }) {
     </div>
   );
 
-  /* ── Bar Chart Data ── */
+  /* ════════════════════════════════════════════════
+     HOME SCREEN — centered menu tiles
+     ════════════════════════════════════════════════ */
+  if (page === "home") {
+    var hour = new Date().getHours();
+    var greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 flex flex-col">
+        {/* Top bar */}
+        <div className="flex items-center justify-between px-6 py-4">
+          <div className="w-8" />
+          <div className="text-xs text-slate-300 font-medium tracking-wide uppercase">EasyRide Support</div>
+          <button onClick={onLogout} className="text-xs text-slate-400 hover:text-slate-600 transition">Sign Out</button>
+        </div>
+
+        {/* Centered content */}
+        <div className="flex-1 flex flex-col items-center justify-center px-6 pb-16">
+          {/* Logo */}
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-3xl font-bold flex items-center justify-center shadow-xl shadow-indigo-500/20 mb-6">ER</div>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{greeting}</h1>
+          <p className="mt-2 text-slate-400 text-sm">What would you like to do?</p>
+
+          {/* Menu Grid */}
+          <div className="grid grid-cols-2 gap-4 mt-10 w-full max-w-lg">
+            {/* Tickets */}
+            <button onClick={function () { openDashboard(); }} className="group relative p-6 rounded-2xl border border-slate-200/80 bg-white text-left hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50 rounded-full -translate-x-4 -translate-y-8 group-hover:scale-150 transition-transform duration-500" />
+              <div className="relative">
+                <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center mb-4 group-hover:bg-indigo-100 group-hover:scale-110 transition-all duration-300">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                </div>
+                <div className="text-base font-semibold text-slate-900">All Tickets</div>
+                <div className="mt-1 text-xs text-slate-400">View & manage tickets</div>
+                <div className="mt-3"><span className="text-2xl font-bold text-indigo-600">{summary.total}</span><span className="ml-1.5 text-xs text-slate-400">total</span></div>
+              </div>
+            </button>
+
+            {/* New Ticket */}
+            <button onClick={function () { openDashboard({ createOpen: true }); }} className="group relative p-6 rounded-2xl border border-slate-200/80 bg-white text-left hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-violet-50 rounded-full -translate-x-4 -translate-y-8 group-hover:scale-150 transition-transform duration-500" />
+              <div className="relative">
+                <div className="w-12 h-12 rounded-xl bg-violet-50 text-violet-500 flex items-center justify-center mb-4 group-hover:bg-violet-100 group-hover:scale-110 transition-all duration-300">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <div className="text-base font-semibold text-slate-900">New Ticket</div>
+                <div className="mt-1 text-xs text-slate-400">Create support ticket</div>
+                <div className="mt-3"><span className="text-2xl font-bold text-violet-600">{summary.unresolved}</span><span className="ml-1.5 text-xs text-slate-400">active</span></div>
+              </div>
+            </button>
+
+            {/* Escalated */}
+            <button onClick={function () { openDashboard({ quickFilter: "escalated" }); }} className="group relative p-6 rounded-2xl border border-slate-200/80 bg-white text-left hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-amber-50 rounded-full -translate-x-4 -translate-y-8 group-hover:scale-150 transition-transform duration-500" />
+              <div className="relative">
+                <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center mb-4 group-hover:bg-amber-100 group-hover:scale-110 transition-all duration-300">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+                </div>
+                <div className="text-base font-semibold text-slate-900">Escalated</div>
+                <div className="mt-1 text-xs text-slate-400">Needs attention</div>
+                <div className="mt-3"><span className={"text-2xl font-bold " + (summary.escalated > 0 ? "text-amber-600" : "text-slate-300")}>{summary.escalated}</span><span className="ml-1.5 text-xs text-slate-400">tickets</span></div>
+              </div>
+            </button>
+
+            {/* Analytics */}
+            <button onClick={function () { openDashboard(); }} className="group relative p-6 rounded-2xl border border-slate-200/80 bg-white text-left hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-full -translate-x-4 -translate-y-8 group-hover:scale-150 transition-transform duration-500" />
+              <div className="relative">
+                <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center mb-4 group-hover:bg-emerald-100 group-hover:scale-110 transition-all duration-300">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
+                </div>
+                <div className="text-base font-semibold text-slate-900">Analytics</div>
+                <div className="mt-1 text-xs text-slate-400">Resolution performance</div>
+                <div className="mt-3"><span className="text-2xl font-bold text-emerald-600">{summary.avgDays > 0 ? summary.avgDays.toFixed(1) + "d" : "\u2014"}</span><span className="ml-1.5 text-xs text-slate-400">avg resolve</span></div>
+              </div>
+            </button>
+          </div>
+
+          {/* Quick stats bar */}
+          <div className="mt-8 flex items-center gap-6 text-xs text-slate-400">
+            <span><span className="font-semibold text-slate-600">{summary.open}</span> open</span>
+            <span className="w-1 h-1 rounded-full bg-slate-200" />
+            <span><span className="font-semibold text-slate-600">{summary.inProgress}</span> in progress</span>
+            <span className="w-1 h-1 rounded-full bg-slate-200" />
+            <span><span className="font-semibold text-slate-600">{summary.resolved}</span> resolved</span>
+          </div>
+        </div>
+
+        <Toasts items={toasts} />
+      </div>
+    );
+  }
+
+  /* ════════════════════════════════════════════════
+     DASHBOARD — full ticket management view
+     ════════════════════════════════════════════════ */
   var chartColors = { Open: "from-slate-300 to-slate-400", "In Progress": "from-blue-400 to-blue-500", Escalated: "from-amber-400 to-orange-500", Resolved: "from-emerald-400 to-emerald-500" };
   var chartCounts = { Open: summary.open, "In Progress": summary.inProgress, Escalated: summary.escalated, Resolved: summary.resolved };
   var chartMax = Math.max(summary.open, summary.inProgress, summary.escalated, summary.resolved, 1);
@@ -179,23 +292,24 @@ function App({ onLogout }) {
     <div className="min-h-screen bg-slate-50 text-slate-900">
       {/* ── Mobile Header ── */}
       <div className="lg:hidden sticky top-0 z-10 flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white/95 backdrop-blur">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-xs font-bold flex items-center justify-center">ER</div>
+        <button onClick={goHome} className="flex items-center gap-2">
+          <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-[10px] font-bold flex items-center justify-center">ER</div>
           <span className="font-bold text-slate-900 text-sm">EasyRide</span>
-        </div>
+        </button>
         <button onClick={onLogout} className="text-xs text-slate-400 hover:text-slate-600 transition">Sign Out</button>
       </div>
 
       <div className="flex min-h-screen">
         {/* ── Desktop Sidebar ── */}
         <aside className="hidden w-64 shrink-0 border-r border-slate-200/60 bg-white p-5 lg:flex lg:flex-col sticky top-0 h-screen">
-          <div className="flex items-center gap-3 mb-8">
+          <button onClick={goHome} className="flex items-center gap-3 mb-8 hover:opacity-70 transition-opacity">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-sm font-bold flex items-center justify-center shadow-sm">ER</div>
-            <div>
+            <div className="text-left">
               <div className="text-sm font-bold text-slate-900">EasyRide</div>
-              <div className="text-xs text-slate-400">Support Tracker</div>
+              <div className="text-xs text-slate-400">Back to Home</div>
             </div>
-          </div>
+          </button>
           <nav className="space-y-1">
             <div className="flex items-center gap-3 rounded-xl bg-indigo-50 px-3 py-2.5 text-sm font-medium text-indigo-700">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
@@ -287,7 +401,7 @@ function App({ onLogout }) {
                 </div>
               </div>
 
-              {/* ── Desktop Table (compact: 5 cols) ── */}
+              {/* ── Desktop Table ── */}
               <div className="hidden md:block">
                 <table className="w-full text-sm">
                   <thead>
