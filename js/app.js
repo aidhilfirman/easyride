@@ -7,7 +7,7 @@ function App({ onLogout }) {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [quickFilter, setQuickFilter] = useState("all");
+  const [quickFilter, setQuickFilter] = useState("none");
   const [sortBy, setSortBy] = useState("timestamp");
   const [createOpen, setCreateOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState("You");
@@ -42,7 +42,7 @@ function App({ onLogout }) {
     setSearch("");
     setDebouncedSearch("");
     setStatusFilter("All");
-    setQuickFilter("all");
+    setQuickFilter("none");
     setSortBy("timestamp");
     setSelectedTicketId("");
   }
@@ -83,6 +83,7 @@ function App({ onLogout }) {
           .filter(Boolean).some(function (f) { return String(f).toLowerCase().indexOf(q) !== -1; });
       });
     }
+    if (quickFilter === "none") return [];
     if (statusFilter !== "All") list = list.filter(function (t) { return t.status === statusFilter; });
     if (quickFilter === "unresolved") list = list.filter(function (t) { return t.status !== "Resolved"; });
     if (quickFilter === "escalated") list = list.filter(function (t) { return t.status === "Escalated"; });
@@ -413,7 +414,7 @@ function App({ onLogout }) {
                           </td>
                         </tr>
                       );
-                    }) : <tr><td colSpan={5} className="px-5 py-16 text-center text-sm text-slate-400">No tickets match your filters.</td></tr>}
+                    }) : <tr><td colSpan={5} className="px-5 py-16 text-center text-sm text-slate-400">{quickFilter === "none" ? "Select a filter above to view tickets." : "No tickets match your filters."}</td></tr>}
                   </tbody>
                 </table>
               </div>
@@ -439,7 +440,7 @@ function App({ onLogout }) {
                       </div>
                     </div>
                   );
-                }) : <div className="p-8 text-center text-sm text-slate-400">No tickets match your filters.</div>}
+                }) : <div className="p-8 text-center text-sm text-slate-400">{quickFilter === "none" ? "Select a filter above to view tickets." : "No tickets match your filters."}</div>}
               </div>
 
               {/* Footer */}
