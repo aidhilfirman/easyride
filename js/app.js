@@ -195,86 +195,61 @@ function App({ onLogout }) {
     var hour = new Date().getHours();
     var greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
+    var tiles = [
+      { action: function () { openDashboard(); }, title: "All Tickets", desc: "View & manage tickets", count: summary.total, label: "total",
+        blob: "bg-indigo-50", iconBox: "bg-indigo-50 text-indigo-500 group-hover:bg-indigo-100", countCls: "text-indigo-600",
+        icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" },
+      { action: function () { openDashboard({ createOpen: true }); }, title: "New Ticket", desc: "Create support ticket", count: summary.unresolved, label: "active",
+        blob: "bg-violet-50", iconBox: "bg-violet-50 text-violet-500 group-hover:bg-violet-100", countCls: "text-violet-600",
+        icon: "M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" },
+      { action: function () { openDashboard({ quickFilter: "escalated" }); }, title: "Escalated", desc: "Needs attention", count: summary.escalated, label: "tickets",
+        blob: "bg-amber-50", iconBox: "bg-amber-50 text-amber-500 group-hover:bg-amber-100", countCls: summary.escalated > 0 ? "text-amber-600" : "text-slate-300",
+        icon: "M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" },
+      { action: function () { openDashboard(); }, title: "Analytics", desc: "Resolution performance", count: summary.avgDays > 0 ? summary.avgDays.toFixed(1) + "d" : "\u2014", label: "avg resolve",
+        blob: "bg-emerald-50", iconBox: "bg-emerald-50 text-emerald-500 group-hover:bg-emerald-100", countCls: "text-emerald-600",
+        icon: "M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" },
+    ];
+
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 flex flex-col">
-        {/* Top bar */}
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="w-8" />
-          <div className="text-xs text-slate-300 font-medium tracking-wide uppercase">EasyRide Support</div>
-          <button onClick={onLogout} className="text-xs text-slate-400 hover:text-slate-600 transition">Sign Out</button>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 flex flex-col items-center justify-center px-6 py-12">
+        {/* Logo + Greeting */}
+        <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-3xl font-bold flex items-center justify-center shadow-xl shadow-indigo-500/20 mb-6">ER</div>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{greeting}</h1>
+        <p className="mt-2 text-slate-400 text-sm">What would you like to do?</p>
+
+        {/* Menu Grid */}
+        <div className="grid grid-cols-2 gap-4 mt-10 w-full max-w-lg">
+          {tiles.map(function (t) {
+            return (
+              <button key={t.title} onClick={t.action} className="group relative p-6 rounded-2xl border border-slate-200/80 bg-white text-left hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                <div className={"absolute top-0 right-0 w-24 h-24 rounded-full -translate-x-4 -translate-y-8 group-hover:scale-150 transition-transform duration-500 " + t.blob} />
+                <div className="relative">
+                  <div className={"w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-300 " + t.iconBox}>
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={t.icon} /></svg>
+                  </div>
+                  <div className="text-base font-semibold text-slate-900">{t.title}</div>
+                  <div className="mt-1 text-xs text-slate-400">{t.desc}</div>
+                  <div className="mt-3"><span className={"text-2xl font-bold " + t.countCls}>{t.count}</span><span className="ml-1.5 text-xs text-slate-400">{t.label}</span></div>
+                </div>
+              </button>
+            );
+          })}
         </div>
 
-        {/* Centered content */}
-        <div className="flex-1 flex flex-col items-center justify-center px-6 pb-16">
-          {/* Logo */}
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-3xl font-bold flex items-center justify-center shadow-xl shadow-indigo-500/20 mb-6">ER</div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{greeting}</h1>
-          <p className="mt-2 text-slate-400 text-sm">What would you like to do?</p>
-
-          {/* Menu Grid */}
-          <div className="grid grid-cols-2 gap-4 mt-10 w-full max-w-lg">
-            {/* Tickets */}
-            <button onClick={function () { openDashboard(); }} className="group relative p-6 rounded-2xl border border-slate-200/80 bg-white text-left hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50 rounded-full -translate-x-4 -translate-y-8 group-hover:scale-150 transition-transform duration-500" />
-              <div className="relative">
-                <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center mb-4 group-hover:bg-indigo-100 group-hover:scale-110 transition-all duration-300">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                </div>
-                <div className="text-base font-semibold text-slate-900">All Tickets</div>
-                <div className="mt-1 text-xs text-slate-400">View & manage tickets</div>
-                <div className="mt-3"><span className="text-2xl font-bold text-indigo-600">{summary.total}</span><span className="ml-1.5 text-xs text-slate-400">total</span></div>
-              </div>
-            </button>
-
-            {/* New Ticket */}
-            <button onClick={function () { openDashboard({ createOpen: true }); }} className="group relative p-6 rounded-2xl border border-slate-200/80 bg-white text-left hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-violet-50 rounded-full -translate-x-4 -translate-y-8 group-hover:scale-150 transition-transform duration-500" />
-              <div className="relative">
-                <div className="w-12 h-12 rounded-xl bg-violet-50 text-violet-500 flex items-center justify-center mb-4 group-hover:bg-violet-100 group-hover:scale-110 transition-all duration-300">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                </div>
-                <div className="text-base font-semibold text-slate-900">New Ticket</div>
-                <div className="mt-1 text-xs text-slate-400">Create support ticket</div>
-                <div className="mt-3"><span className="text-2xl font-bold text-violet-600">{summary.unresolved}</span><span className="ml-1.5 text-xs text-slate-400">active</span></div>
-              </div>
-            </button>
-
-            {/* Escalated */}
-            <button onClick={function () { openDashboard({ quickFilter: "escalated" }); }} className="group relative p-6 rounded-2xl border border-slate-200/80 bg-white text-left hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-amber-50 rounded-full -translate-x-4 -translate-y-8 group-hover:scale-150 transition-transform duration-500" />
-              <div className="relative">
-                <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center mb-4 group-hover:bg-amber-100 group-hover:scale-110 transition-all duration-300">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
-                </div>
-                <div className="text-base font-semibold text-slate-900">Escalated</div>
-                <div className="mt-1 text-xs text-slate-400">Needs attention</div>
-                <div className="mt-3"><span className={"text-2xl font-bold " + (summary.escalated > 0 ? "text-amber-600" : "text-slate-300")}>{summary.escalated}</span><span className="ml-1.5 text-xs text-slate-400">tickets</span></div>
-              </div>
-            </button>
-
-            {/* Analytics */}
-            <button onClick={function () { openDashboard(); }} className="group relative p-6 rounded-2xl border border-slate-200/80 bg-white text-left hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-full -translate-x-4 -translate-y-8 group-hover:scale-150 transition-transform duration-500" />
-              <div className="relative">
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center mb-4 group-hover:bg-emerald-100 group-hover:scale-110 transition-all duration-300">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
-                </div>
-                <div className="text-base font-semibold text-slate-900">Analytics</div>
-                <div className="mt-1 text-xs text-slate-400">Resolution performance</div>
-                <div className="mt-3"><span className="text-2xl font-bold text-emerald-600">{summary.avgDays > 0 ? summary.avgDays.toFixed(1) + "d" : "\u2014"}</span><span className="ml-1.5 text-xs text-slate-400">avg resolve</span></div>
-              </div>
-            </button>
-          </div>
-
-          {/* Quick stats bar */}
-          <div className="mt-8 flex items-center gap-6 text-xs text-slate-400">
-            <span><span className="font-semibold text-slate-600">{summary.open}</span> open</span>
-            <span className="w-1 h-1 rounded-full bg-slate-200" />
-            <span><span className="font-semibold text-slate-600">{summary.inProgress}</span> in progress</span>
-            <span className="w-1 h-1 rounded-full bg-slate-200" />
-            <span><span className="font-semibold text-slate-600">{summary.resolved}</span> resolved</span>
-          </div>
+        {/* Quick stats */}
+        <div className="mt-8 flex items-center gap-6 text-xs text-slate-400">
+          <span><span className="font-semibold text-slate-600">{summary.open}</span> open</span>
+          <span className="w-1 h-1 rounded-full bg-slate-200" />
+          <span><span className="font-semibold text-slate-600">{summary.inProgress}</span> in progress</span>
+          <span className="w-1 h-1 rounded-full bg-slate-200" />
+          <span><span className="font-semibold text-slate-600">{summary.resolved}</span> resolved</span>
         </div>
+
+        {/* Sign Out */}
+        <button onClick={onLogout} className="mt-10 flex items-center gap-2 rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-500 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-all">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+          Sign Out
+        </button>
 
         <Toasts items={toasts} />
       </div>
