@@ -7,6 +7,7 @@ function App({ onLogout }) {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [monthFilter, setMonthFilter] = useState("All");
   const [quickFilter, setQuickFilter] = useState("all");
   const [sortBy, setSortBy] = useState("timestamp");
   const [createOpen, setCreateOpen] = useState(false);
@@ -42,6 +43,7 @@ function App({ onLogout }) {
     setSearch("");
     setDebouncedSearch("");
     setStatusFilter("All");
+    setMonthFilter("All");
     setQuickFilter("all");
     setSortBy("timestamp");
     setSelectedTicketId("");
@@ -74,6 +76,15 @@ function App({ onLogout }) {
     return { total: total, open: open, inProgress: inProgress, escalated: escalated, resolved: resolved, avgDays: avgDays, unresolved: unresolved };
   }, [tickets, nowMs]);
 
+  var monthOptions = useMemo(function () {
+    var set = {};
+    tickets.forEach(function (t) {
+      var d = toDate(t.timestampReceived);
+      if (d) { var key = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"); set[key] = true; }
+    });
+    return Object.keys(set).sort().reverse();
+  }, [tickets]);
+
   var filteredTickets = useMemo(function () {
     var list = tickets.slice();
     if (debouncedSearch.trim()) {
@@ -85,6 +96,10 @@ function App({ onLogout }) {
     }
     if (quickFilter === "none") return [];
     if (statusFilter !== "All") list = list.filter(function (t) { return t.status === statusFilter; });
+    if (monthFilter !== "All") list = list.filter(function (t) {
+      var d = toDate(t.timestampReceived);
+      return d && (d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0")) === monthFilter;
+    });
     if (quickFilter === "unresolved") list = list.filter(function (t) { return t.status !== "Resolved"; });
     if (quickFilter === "escalated") list = list.filter(function (t) { return t.status === "Escalated"; });
     if (quickFilter === "my") list = list.filter(function (t) { return String(t.responsiblePerson || "").toLowerCase().indexOf(currentUser.toLowerCase()) !== -1; });
@@ -96,7 +111,7 @@ function App({ onLogout }) {
       return bT - aT;
     });
     return list;
-  }, [tickets, debouncedSearch, statusFilter, quickFilter, sortBy, nowMs, currentUser]);
+  }, [tickets, debouncedSearch, statusFilter, monthFilter, quickFilter, sortBy, nowMs, currentUser]);
 
   var selectedTicket = tickets.find(function (t) { return t.id === selectedTicketId; }) || null;
 
@@ -362,6 +377,10 @@ function App({ onLogout }) {
                     <select value={statusFilter} onChange={function (e) { setStatusFilter(e.target.value); }} className="rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2.5 text-sm outline-none focus:border-indigo-400 transition">
                       <option value="All">All Statuses</option>
                       {STATUS_ORDER.map(function (s) { return <option key={s} value={s}>{s}</option>; })}
+                    </select>
+                    <select value={monthFilter} onChange={function (e) { setMonthFilter(e.target.value); }} className="rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2.5 text-sm outline-none focus:border-indigo-400 transition">
+                      <option value="All">All Months</option>
+                      {monthOptions.map(function (m) { var parts = m.split("-"); var label = new Date(parts[0], parts[1] - 1).toLocaleString("default", { month: "short", year: "numeric" }); return <option key={m} value={m}>{label}</option>; })}
                     </select>
                     <select value={sortBy} onChange={function (e) { setSortBy(e.target.value); }} className="rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2.5 text-sm outline-none focus:border-indigo-400 transition">
                       <option value="timestamp">Newest first</option>
