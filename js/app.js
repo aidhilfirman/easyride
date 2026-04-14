@@ -7,7 +7,7 @@ function App({ onLogout }) {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [quickFilter, setQuickFilter] = useState("none");
+  const [quickFilter, setQuickFilter] = useState("all");
   const [sortBy, setSortBy] = useState("timestamp");
   const [createOpen, setCreateOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState("You");
@@ -42,7 +42,7 @@ function App({ onLogout }) {
     setSearch("");
     setDebouncedSearch("");
     setStatusFilter("All");
-    setQuickFilter("none");
+    setQuickFilter("all");
     setSortBy("timestamp");
     setSelectedTicketId("");
   }
@@ -372,7 +372,7 @@ function App({ onLogout }) {
                 </div>
                 <div className="flex flex-wrap gap-1.5 mt-3">
                   {[{ key: "all", label: "All" }, { key: "unresolved", label: "Unresolved" }, { key: "escalated", label: "Escalated" }, { key: "my", label: "My Tickets" }].map(function (item) {
-                    return <button key={item.key} type="button" onClick={function () { setQuickFilter(item.key); }} className={"rounded-lg px-3 py-1.5 text-xs font-semibold transition " + (quickFilter === item.key ? "bg-indigo-500 text-white shadow-sm" : "bg-slate-100 text-slate-500 hover:bg-slate-200")}>{item.label}</button>;
+                    return <button key={item.key} type="button" onClick={function () { setQuickFilter(quickFilter === item.key ? "none" : item.key); }} className={"rounded-lg px-3 py-1.5 text-xs font-semibold transition " + (quickFilter === item.key ? "bg-indigo-500 text-white shadow-sm" : "bg-slate-100 text-slate-500 hover:bg-slate-200")}>{item.label}</button>;
                   })}
                 </div>
               </div>
