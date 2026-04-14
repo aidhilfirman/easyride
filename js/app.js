@@ -32,6 +32,30 @@ function App({ onLogout }) {
       .finally(function () { setSheetLoading(false); });
   }, []);
 
+  useEffect(function () {
+    var t = setInterval(function () {
+      fetchSheetData().then(function (data) { setTickets(data); }).catch(function () {});
+    }, 30000);
+    return function () { clearInterval(t); };
+  }, []);
+
+  function exportCSV() {
+    var headers = ["Ticket ID","Rider No","Rider Name","Issue","Received","Acknowledged","Responsible Person","Escalated To","Solution","Status","Solved At","Duration"];
+    var rows = filteredTickets.map(function (t) {
+      return [t.id, t.riderNo, t.riderName, t.issue, t.timestampReceived, t.acknowledged ? "Done" : "", t.responsiblePerson, t.escalatedTo, t.solution, t.status, t.timestampSolved, t.importedDurationLabel || formatDuration(t, nowMs)].map(function (v) {
+        var s = String(v || "").replace(/"/g, '""');
+        return '"' + s + '"';
+      }).join(",");
+    });
+    var csv = [headers.join(",")].concat(rows).join("\n");
+    var blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "easyride-tickets-" + new Date().toISOString().slice(0, 10) + ".csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
   function showToast(message, type) {
     var id = Date.now() + Math.random();
     setToasts(function (prev) { return prev.concat({ id: id, message: message, type: type }); });
@@ -331,7 +355,12 @@ function App({ onLogout }) {
                 <h1 className="text-xl md:text-2xl font-bold tracking-tight text-slate-900">Ticket Dashboard</h1>
                 <p className="mt-1 text-sm text-slate-400">{filteredTickets.length} of {tickets.length} tickets</p>
               </div>
-              <button type="button" onClick={function () { setCreateOpen(true); }} className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:shadow-md hover:brightness-110 transition-all self-start sm:self-auto">+ New Ticket</button>
+              <div className="flex gap-2 self-start sm:self-auto">
+                <button type="button" onClick={exportCSV} className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition">
+                  <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>Export
+                </button>
+                <button type="button" onClick={function () { setCreateOpen(true); }} className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:shadow-md hover:brightness-110 transition-all">+ New Ticket</button>
+              </div>
             </div>
 
             {/* Stat Cards */}
