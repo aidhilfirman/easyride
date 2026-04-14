@@ -65,12 +65,10 @@ function TicketDrawer({ ticket, onClose, onChange, onSave, onDelete, onAddCommen
   useEffect(function () { setCommentText(""); setEditing(false); }, [ticket ? ticket.id : ""]);
   if (!ticket) return null;
 
-  const editClass = "w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-sm outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition";
-  const viewClass = "w-full rounded-xl border border-transparent bg-transparent px-3.5 py-2.5 text-sm text-slate-900";
-  const fieldClass = editing ? editClass : viewClass;
-  const warn = getWarningLevel(ticket, nowMs);
-
-  function viewVal(val) { return val || "\u2014"; }
+  var fc = "w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition ";
+  var fieldClass = fc + (editing ? "border-slate-200 bg-slate-50/50 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400" : "border-slate-100 bg-slate-50/30 text-slate-900 cursor-default");
+  var warn = getWarningLevel(ticket, nowMs);
+  var ro = !editing;
 
   return (
     <div className="fixed inset-0 z-40 flex">
@@ -89,10 +87,9 @@ function TicketDrawer({ ticket, onClose, onChange, onSave, onDelete, onAddCommen
             <div className="mt-1 text-xs text-slate-400">{formatDuration(ticket, nowMs)}</div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            {!editing && <button type="button" onClick={function () { setEditing(true); }} className="rounded-xl border border-slate-200 px-3.5 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:border-indigo-300 hover:text-indigo-600 transition">
-              <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" /></svg>Edit
-            </button>}
-            {editing && <button type="button" onClick={function () { setEditing(false); }} className="rounded-xl border border-slate-200 px-3.5 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50 transition">Cancel</button>}
+            <button type="button" onClick={function () { setEditing(!editing); }} className={"rounded-xl border px-3.5 py-2 text-sm font-medium transition " + (editing ? "border-indigo-300 bg-indigo-50 text-indigo-600" : "border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-indigo-300 hover:text-indigo-600")}>
+              <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" /></svg>{editing ? "Editing" : "Edit"}
+            </button>
             <button type="button" onClick={onClose} className="rounded-xl border border-slate-200 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
@@ -102,17 +99,17 @@ function TicketDrawer({ ticket, onClose, onChange, onSave, onDelete, onAddCommen
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Rider No.</div>{editing ? <input value={ticket.riderNo || ""} onChange={(e) => onChange(ticket.id, { riderNo: e.target.value })} className={fieldClass} /> : <div className={viewClass}>{viewVal(ticket.riderNo)}</div>}</label>
-            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Rider Name</div>{editing ? <input value={ticket.riderName || ""} onChange={(e) => onChange(ticket.id, { riderName: e.target.value })} className={fieldClass} /> : <div className={viewClass}>{viewVal(ticket.riderName)}</div>}</label>
-            <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-medium text-slate-600">Issue</div>{editing ? <input value={ticket.issue || ""} onChange={(e) => onChange(ticket.id, { issue: e.target.value })} className={fieldClass} /> : <div className={viewClass}>{viewVal(ticket.issue)}</div>}</label>
-            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Received</div>{editing ? <input value={ticket.timestampReceived || ""} onChange={(e) => onChange(ticket.id, { timestampReceived: e.target.value })} className={fieldClass} /> : <div className={viewClass}>{formatDateTime(ticket.timestampReceived)}</div>}</label>
-            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Acknowledged</div>{editing ? <select value={ticket.acknowledged ? "Done" : ""} onChange={(e) => onChange(ticket.id, { acknowledged: e.target.value === "Done" })} className={fieldClass}><option value="">Not yet</option><option value="Done">Done</option></select> : <div className={viewClass}>{ticket.acknowledged ? "Done" : "Not yet"}</div>}</label>
-            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Responsible Person</div>{editing ? <input list="staff-opts" value={ticket.responsiblePerson || ""} onChange={(e) => onChange(ticket.id, { responsiblePerson: e.target.value })} className={fieldClass} /> : <div className={viewClass}>{viewVal(ticket.responsiblePerson)}</div>}</label>
-            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Escalated to</div>{editing ? <input list="staff-opts" value={ticket.escalatedTo || ""} onChange={(e) => onChange(ticket.id, { escalatedTo: e.target.value })} className={fieldClass} /> : <div className={viewClass}>{viewVal(ticket.escalatedTo)}</div>}</label>
-            <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-medium text-slate-600">Solution</div>{editing ? <input value={ticket.solution || ""} onChange={(e) => onChange(ticket.id, { solution: e.target.value })} className={fieldClass} /> : <div className={viewClass}>{viewVal(ticket.solution)}</div>}</label>
-            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Status</div>{editing ? <select value={ticket.status} onChange={(e) => onChange(ticket.id, { status: e.target.value })} className={fieldClass}>{STATUS_ORDER.map(function (s) { return <option key={s} value={s}>{s}</option>; })}</select> : <div className={viewClass}><Badge tone={STATUS_STYLES[ticket.status]}>{ticket.status}</Badge></div>}</label>
-            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Solved At</div>{editing ? <input value={ticket.timestampSolved || ""} onChange={(e) => onChange(ticket.id, { timestampSolved: e.target.value })} className={fieldClass} /> : <div className={viewClass}>{formatDateTime(ticket.timestampSolved)}</div>}</label>
-            <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-medium text-slate-600">Duration</div>{editing ? <input value={ticket.importedDurationLabel || ""} onChange={(e) => onChange(ticket.id, { importedDurationLabel: e.target.value, duration: e.target.value })} placeholder="e.g. 3 days, Same day" className={fieldClass} /> : <div className={viewClass}>{viewVal(ticket.importedDurationLabel) === "\u2014" ? formatDuration(ticket, nowMs) : ticket.importedDurationLabel}</div>}</label>
+            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Rider No.</div><input readOnly={ro} value={ticket.riderNo || ""} onChange={(e) => onChange(ticket.id, { riderNo: e.target.value })} className={fieldClass} /></label>
+            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Rider Name</div><input readOnly={ro} value={ticket.riderName || ""} onChange={(e) => onChange(ticket.id, { riderName: e.target.value })} className={fieldClass} /></label>
+            <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-medium text-slate-600">Issue</div><input readOnly={ro} value={ticket.issue || ""} onChange={(e) => onChange(ticket.id, { issue: e.target.value })} className={fieldClass} /></label>
+            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Received</div><input readOnly={ro} value={ticket.timestampReceived || ""} onChange={(e) => onChange(ticket.id, { timestampReceived: e.target.value })} className={fieldClass} /></label>
+            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Acknowledged</div><select disabled={ro} value={ticket.acknowledged ? "Done" : ""} onChange={(e) => onChange(ticket.id, { acknowledged: e.target.value === "Done" })} className={fieldClass}><option value="">Not yet</option><option value="Done">Done</option></select></label>
+            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Responsible Person</div><input readOnly={ro} list={editing ? "staff-opts" : undefined} value={ticket.responsiblePerson || ""} onChange={(e) => onChange(ticket.id, { responsiblePerson: e.target.value })} className={fieldClass} /></label>
+            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Escalated to</div><input readOnly={ro} list={editing ? "staff-opts" : undefined} value={ticket.escalatedTo || ""} onChange={(e) => onChange(ticket.id, { escalatedTo: e.target.value })} className={fieldClass} /></label>
+            <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-medium text-slate-600">Solution</div><input readOnly={ro} value={ticket.solution || ""} onChange={(e) => onChange(ticket.id, { solution: e.target.value })} className={fieldClass} /></label>
+            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Status</div><select disabled={ro} value={ticket.status} onChange={(e) => onChange(ticket.id, { status: e.target.value })} className={fieldClass}>{STATUS_ORDER.map(function (s) { return <option key={s} value={s}>{s}</option>; })}</select></label>
+            <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Solved At</div><input readOnly={ro} value={ticket.timestampSolved || ""} onChange={(e) => onChange(ticket.id, { timestampSolved: e.target.value })} className={fieldClass} /></label>
+            <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-medium text-slate-600">Duration</div><input readOnly={ro} value={ticket.importedDurationLabel || ""} onChange={(e) => onChange(ticket.id, { importedDurationLabel: e.target.value, duration: e.target.value })} placeholder={editing ? "e.g. 3 days, Same day" : ""} className={fieldClass} /></label>
           </div>
 
           {/* Internal Notes */}
@@ -131,7 +128,7 @@ function TicketDrawer({ ticket, onClose, onChange, onSave, onDelete, onAddCommen
                 );
               }) : <div className="rounded-xl border border-dashed border-slate-200 p-4 text-sm text-slate-400">No notes yet.</div>}
               <div className="rounded-xl border border-slate-200 p-3">
-                <textarea rows={2} value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Add a note..." className={"mb-2 " + editClass} />
+                <textarea rows={2} value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Add a note..." className={"mb-2 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-sm outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition"} />
                 <div className="flex justify-end">
                   <button type="button" onClick={function () {
                     if (!commentText.trim()) return;
@@ -146,15 +143,12 @@ function TicketDrawer({ ticket, onClose, onChange, onSave, onDelete, onAddCommen
 
         {/* Footer */}
         <div className="border-t border-slate-100 px-6 py-4 flex items-center justify-between gap-3 shrink-0">
-          {editing ? (
-            <button type="button" onClick={function () { if (confirm("Delete this ticket? This will also remove it from the spreadsheet.")) onDelete(ticket.id); }} className="rounded-xl px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition">Delete</button>
-          ) : <div />}
+          <button type="button" onClick={function () { if (confirm("Delete this ticket? This will also remove it from the spreadsheet.")) onDelete(ticket.id); }} className="rounded-xl px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition">Delete</button>
           {editing ? (
             <button type="button" onClick={function () { onSave(ticket.id); setEditing(false); onClose(); }} className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:shadow-md hover:brightness-110 transition-all">Save to Spreadsheet</button>
           ) : (
             <button type="button" onClick={onClose} className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition">Close</button>
-          )}
-        </div>
+          )}</div>
 
         <datalist id="staff-opts">{staffOptions.map(function (n) { return <option key={n} value={n} />; })}</datalist>
       </div>
