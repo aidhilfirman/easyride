@@ -10,7 +10,6 @@ function App({ onLogout }) {
   const [monthFilter, setMonthFilter] = useState("All");
   const [quickFilter, setQuickFilter] = useState("all");
   const [sortBy, setSortBy] = useState("timestamp");
-  const [sortDir, setSortDir] = useState("desc");
   const [createOpen, setCreateOpen] = useState(false);
   const [pageSize, setPageSize] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
@@ -94,7 +93,6 @@ function App({ onLogout }) {
     setMonthFilter("All");
     setQuickFilter("all");
     setSortBy("timestamp");
-    setSortDir("desc");
     setCurrentPage(1);
     setSelectedTicketId("");
     setAckSearch("");
@@ -102,11 +100,6 @@ function App({ onLogout }) {
     setAckFilter("All");
     setAckSort("newest");
     setSelectedAckId("");
-  }
-
-  function toggleSort(col) {
-    if (sortBy === col) { setSortDir(sortDir === "asc" ? "desc" : "asc"); }
-    else { setSortBy(col); setSortDir(col === "duration" ? "desc" : "asc"); }
   }
 
   function openDashboard(options) {
@@ -125,14 +118,15 @@ function App({ onLogout }) {
   }, [tickets]);
 
   var summary = useMemo(function () {
-    var open = 0, inProgress = 0, escalated = 0, resolved = 0, resolvedDays = 0;
-    tickets.forEach(function (t) {
-      if (t.status === "Open") open++;
-      else if (t.status === "In Progress") inProgress++;
-      else if (t.status === "Escalated") escalated++;
-      else if (t.status === "Resolved") { resolved++; resolvedDays += getDurationDays(t, nowMs); }
-    });
-    return { total: tickets.length, open: open, inProgress: inProgress, escalated: escalated, resolved: resolved, avgDays: resolved ? resolvedDays / resolved : 0, unresolved: tickets.length - resolved };
+    var total = tickets.length;
+    var open = tickets.filter(function (t) { return t.status === "Open"; }).length;
+    var inProgress = tickets.filter(function (t) { return t.status === "In Progress"; }).length;
+    var escalated = tickets.filter(function (t) { return t.status === "Escalated"; }).length;
+    var resolved = tickets.filter(function (t) { return t.status === "Resolved"; }).length;
+    var resolvedList = tickets.filter(function (t) { return t.status === "Resolved"; });
+    var avgDays = resolvedList.length ? resolvedList.reduce(function (sum, t) { return sum + getDurationDays(t, nowMs); }, 0) / resolvedList.length : 0;
+    var unresolved = total - resolved;
+    return { total: total, open: open, inProgress: inProgress, escalated: escalated, resolved: resolved, avgDays: avgDays, unresolved: unresolved };
   }, [tickets, nowMs]);
 
   var monthOptions = useMemo(function () {
@@ -162,21 +156,17 @@ function App({ onLogout }) {
     if (quickFilter === "unresolved") list = list.filter(function (t) { return t.status !== "Resolved"; });
     if (quickFilter === "escalated") list = list.filter(function (t) { return t.status === "Escalated"; });
     if (quickFilter === "my") list = list.filter(function (t) { return String(t.responsiblePerson || "").toLowerCase().indexOf(currentUser.toLowerCase()) !== -1; });
-    var dir = sortDir === "asc" ? 1 : -1;
     list.sort(function (a, b) {
-      var cmp = 0;
-      if (sortBy === "rider") cmp = (a.riderName || "").localeCompare(b.riderName || "");
-      else if (sortBy === "issue") cmp = (a.issue || "").localeCompare(b.issue || "");
-      else if (sortBy === "status") cmp = STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status);
-      else if (sortBy === "assigned") cmp = (a.responsiblePerson || "").localeCompare(b.responsiblePerson || "");
-      else if (sortBy === "duration") cmp = getDurationDays(a, nowMs) - getDurationDays(b, nowMs);
-      else { var aT = toDate(a.timestampReceived) ? toDate(a.timestampReceived).getTime() : 0; var bT = toDate(b.timestampReceived) ? toDate(b.timestampReceived).getTime() : 0; cmp = aT - bT; }
-      return cmp * dir;
+      if (sortBy === "status") return STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status);
+      if (sortBy === "duration") return getDurationDays(b, nowMs) - getDurationDays(a, nowMs);
+      var aT = toDate(a.timestampReceived) ? toDate(a.timestampReceived).getTime() : 0;
+      var bT = toDate(b.timestampReceived) ? toDate(b.timestampReceived).getTime() : 0;
+      return bT - aT;
     });
     return list;
-  }, [tickets, debouncedSearch, statusFilter, monthFilter, quickFilter, sortBy, sortDir, nowMs, currentUser]);
+  }, [tickets, debouncedSearch, statusFilter, monthFilter, quickFilter, sortBy, nowMs, currentUser]);
 
-  useEffect(function () { setCurrentPage(1); }, [debouncedSearch, statusFilter, monthFilter, quickFilter, sortBy, sortDir, pageSize]);
+  useEffect(function () { setCurrentPage(1); }, [debouncedSearch, statusFilter, monthFilter, quickFilter, sortBy, pageSize]);
 
   var totalPages = Math.max(1, Math.ceil(filteredTickets.length / pageSize));
   var safeCurrentPage = Math.min(currentPage, totalPages);
@@ -461,14 +451,14 @@ function App({ onLogout }) {
             </div>
           </button>
           <nav className="space-y-1">
-            <button onClick={function () { setPage("dashboard"); }} className={"w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition " + (page === "dashboard" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700")}>
+            <button onClick={function () { openDashboard(); }} className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 transition">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-              Support Tracker
+              Support Tickets
             </button>
-            <button onClick={function () { setPage("ack"); }} className={"w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition " + (page === "ack" ? "bg-teal-50 text-teal-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700")}>
+            <div className="flex items-center gap-3 rounded-xl bg-teal-50 px-3 py-2.5 text-sm font-medium text-teal-700">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              Trips Ack Tracker
-            </button>
+              Trip Ack Tracker
+            </div>
           </nav>
           <div className="mt-auto pt-6">
             <button type="button" onClick={onLogout} className="w-full flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition">
@@ -619,14 +609,10 @@ function App({ onLogout }) {
             </div>
           </button>
           <nav className="space-y-1">
-            <button onClick={function () { setPage("dashboard"); }} className={"w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition " + (page === "dashboard" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700")}>
+            <div className="flex items-center gap-3 rounded-xl bg-indigo-50 px-3 py-2.5 text-sm font-medium text-indigo-700">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-              Support Tracker
-            </button>
-            <button onClick={function () { setPage("ack"); }} className={"w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition " + (page === "ack" ? "bg-teal-50 text-teal-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700")}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              Trips Ack Tracker
-            </button>
+              Tickets
+            </div>
           </nav>
           <div className="mt-8 rounded-xl border border-slate-200/60 bg-slate-50/50 p-4">
             <div className="text-xs font-medium uppercase tracking-wide text-slate-400 mb-2">Your Name</div>
@@ -708,9 +694,11 @@ function App({ onLogout }) {
                       <option value="All">All Months</option>
                       {monthOptions.map(function (m) { var parts = m.split("-"); var label = new Date(parts[0], parts[1] - 1).toLocaleString("default", { month: "short", year: "numeric" }); return <option key={m} value={m}>{label}</option>; })}
                     </select>
-                    <button type="button" onClick={function () { setSortBy("timestamp"); setSortDir("desc"); }} className={"rounded-xl border px-3 py-2.5 text-sm font-medium transition " + (sortBy === "timestamp" ? "border-indigo-300 bg-indigo-50 text-indigo-600" : "border-slate-200 bg-slate-50/50 text-slate-500 hover:bg-slate-100")}>
-                      Newest first
-                    </button>
+                    <select value={sortBy} onChange={function (e) { setSortBy(e.target.value); }} className="rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2.5 text-sm outline-none focus:border-indigo-400 transition">
+                      <option value="timestamp">Newest first</option>
+                      <option value="status">By Status</option>
+                      <option value="duration">By Duration</option>
+                    </select>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mt-3">
@@ -725,11 +713,11 @@ function App({ onLogout }) {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-slate-100">
-                      {[{ key: "rider", label: "Rider" }, { key: "issue", label: "Issue" }, { key: "status", label: "Status" }, { key: "assigned", label: "Assigned", hide: "hidden lg:table-cell" }, { key: "duration", label: "Duration" }].map(function (col) {
-                        var active = sortBy === col.key;
-                        var arrow = active ? (sortDir === "asc" ? " \u2191" : " \u2193") : "";
-                        return <th key={col.key} onClick={function () { toggleSort(col.key); }} className={"px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide cursor-pointer select-none transition hover:text-indigo-500 " + (active ? "text-indigo-600" : "text-slate-400") + (col.hide ? " " + col.hide : "")}>{col.label}{arrow}</th>;
-                      })}
+                      <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Rider</th>
+                      <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Issue</th>
+                      <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Status</th>
+                      <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400 hidden lg:table-cell">Assigned</th>
+                      <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Duration</th>
                     </tr>
                   </thead>
                   <tbody>
