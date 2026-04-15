@@ -8,7 +8,6 @@ function App({ onLogout }) {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [monthFilter, setMonthFilter] = useState("All");
-  const [quickFilter, setQuickFilter] = useState("all");
   const [sortBy, setSortBy] = useState("timestamp");
   const [sortDir, setSortDir] = useState("desc");
   const [createOpen, setCreateOpen] = useState(false);
@@ -92,7 +91,6 @@ function App({ onLogout }) {
     setDebouncedSearch("");
     setStatusFilter("All");
     setMonthFilter("All");
-    setQuickFilter("all");
     setSortBy("timestamp");
     setSortDir("desc");
     setCurrentPage(1);
@@ -110,7 +108,7 @@ function App({ onLogout }) {
   }
 
   function openDashboard(options) {
-    if (options && options.quickFilter) setQuickFilter(options.quickFilter);
+    if (options && options.statusFilter) setStatusFilter(options.statusFilter);
     if (options && options.createOpen) setCreateOpen(true);
     setPage("dashboard");
   }
@@ -153,15 +151,11 @@ function App({ onLogout }) {
           .filter(Boolean).some(function (f) { return String(f).toLowerCase().indexOf(q) !== -1; });
       });
     }
-    if (quickFilter === "none") return [];
     if (statusFilter !== "All") list = list.filter(function (t) { return t.status === statusFilter; });
     if (monthFilter !== "All") list = list.filter(function (t) {
       var d = toDate(t.timestampReceived);
       return d && (d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0")) === monthFilter;
     });
-    if (quickFilter === "unresolved") list = list.filter(function (t) { return t.status !== "Resolved"; });
-    if (quickFilter === "escalated") list = list.filter(function (t) { return t.status === "Escalated"; });
-    if (quickFilter === "my") list = list.filter(function (t) { return String(t.responsiblePerson || "").toLowerCase().indexOf(currentUser.toLowerCase()) !== -1; });
     var dir = sortDir === "asc" ? 1 : -1;
     list.sort(function (a, b) {
       var cmp = 0;
@@ -174,9 +168,9 @@ function App({ onLogout }) {
       return cmp * dir;
     });
     return list;
-  }, [tickets, debouncedSearch, statusFilter, monthFilter, quickFilter, sortBy, sortDir, nowMs, currentUser]);
+  }, [tickets, debouncedSearch, statusFilter, monthFilter, sortBy, sortDir, nowMs]);
 
-  useEffect(function () { setCurrentPage(1); }, [debouncedSearch, statusFilter, monthFilter, quickFilter, sortBy, sortDir, pageSize]);
+  useEffect(function () { setCurrentPage(1); }, [debouncedSearch, statusFilter, monthFilter, sortBy, sortDir, pageSize]);
 
   var totalPages = Math.max(1, Math.ceil(filteredTickets.length / pageSize));
   var safeCurrentPage = Math.min(currentPage, totalPages);
@@ -377,7 +371,7 @@ function App({ onLogout }) {
       { action: function () { openDashboard({ createOpen: true }); }, title: "New Ticket", desc: "Create support ticket", count: summary.unresolved, label: "active",
         blob: "bg-violet-50", iconBox: "bg-violet-50 text-violet-500 group-hover:bg-violet-100", countCls: "text-violet-600",
         icon: "M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" },
-      { action: function () { openDashboard({ quickFilter: "escalated" }); }, title: "Escalated", desc: "Needs attention", count: summary.escalated, label: "tickets",
+      { action: function () { openDashboard({ statusFilter: "Escalated" }); }, title: "Escalated", desc: "Needs attention", count: summary.escalated, label: "tickets",
         blob: "bg-amber-50", iconBox: "bg-amber-50 text-amber-500 group-hover:bg-amber-100", countCls: summary.escalated > 0 ? "text-amber-600" : "text-slate-300",
         icon: "M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" },
       { action: function () { openDashboard(); }, title: "Analytics", desc: "Resolution performance", count: summary.avgDays > 0 ? summary.avgDays.toFixed(1) + "d" : "\u2014", label: "avg resolve",
@@ -628,12 +622,6 @@ function App({ onLogout }) {
               Trips Ack Tracker
             </button>
           </nav>
-          <div className="mt-8 rounded-xl border border-slate-200/60 bg-slate-50/50 p-4">
-            <div className="text-xs font-medium uppercase tracking-wide text-slate-400 mb-2">Your Name</div>
-            <input list="staff-sidebar" value={currentUser} onChange={function (e) { setCurrentUser(e.target.value); }} placeholder="Your name" className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-400 transition" />
-            <datalist id="staff-sidebar">{STAFF_LIST.map(function (n) { return <option key={n} value={n} />; })}</datalist>
-            <div className="mt-2 text-xs text-slate-400">For "My Tickets" filter</div>
-          </div>
           <div className="mt-auto pt-6">
             <button type="button" onClick={onLogout} className="w-full flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
@@ -713,11 +701,6 @@ function App({ onLogout }) {
                     </button>
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-1.5 mt-3">
-                  {[{ key: "all", label: "All" }, { key: "unresolved", label: "Unresolved" }, { key: "escalated", label: "Escalated" }, { key: "my", label: "My Tickets" }].map(function (item) {
-                    return <button key={item.key} type="button" onClick={function () { setQuickFilter(quickFilter === item.key ? "none" : item.key); }} className={"rounded-lg px-3 py-1.5 text-xs font-semibold transition " + (quickFilter === item.key ? "bg-indigo-500 text-white shadow-sm" : "bg-slate-100 text-slate-500 hover:bg-slate-200")}>{item.label}</button>;
-                  })}
-                </div>
               </div>
 
               {/* ── Desktop Table ── */}
@@ -757,7 +740,7 @@ function App({ onLogout }) {
                           </td>
                         </tr>
                       );
-                    }) : <tr><td colSpan={5} className="px-5 py-16 text-center text-sm text-slate-400">{quickFilter === "none" ? "Select a filter above to view tickets." : "No tickets match your filters."}</td></tr>}
+                    }) : <tr><td colSpan={5} className="px-5 py-16 text-center text-sm text-slate-400">{No tickets match your filters.}</td></tr>}
                   </tbody>
                 </table>
               </div>
@@ -783,7 +766,7 @@ function App({ onLogout }) {
                       </div>
                     </div>
                   );
-                }) : <div className="p-8 text-center text-sm text-slate-400">{quickFilter === "none" ? "Select a filter above to view tickets." : "No tickets match your filters."}</div>}
+                }) : <div className="p-8 text-center text-sm text-slate-400">{No tickets match your filters.}</div>}
               </div>
 
               {/* Footer with Pagination */}
