@@ -11,6 +11,8 @@ function App({ onLogout }) {
   const [quickFilter, setQuickFilter] = useState("all");
   const [sortBy, setSortBy] = useState("timestamp");
   const [createOpen, setCreateOpen] = useState(false);
+  const [pageSize, setPageSize] = useState(25);
+  const [currentPage, setCurrentPage] = useState(1);
   const [currentUser, setCurrentUser] = useState("You");
   const [nowMs, setNowMs] = useState(Date.now());
   const [toasts, setToasts] = useState([]);
@@ -91,6 +93,7 @@ function App({ onLogout }) {
     setMonthFilter("All");
     setQuickFilter("all");
     setSortBy("timestamp");
+    setCurrentPage(1);
     setSelectedTicketId("");
     setAckSearch("");
     setDebouncedAckSearch("");
@@ -162,6 +165,12 @@ function App({ onLogout }) {
     });
     return list;
   }, [tickets, debouncedSearch, statusFilter, monthFilter, quickFilter, sortBy, nowMs, currentUser]);
+
+  useEffect(function () { setCurrentPage(1); }, [debouncedSearch, statusFilter, monthFilter, quickFilter, sortBy, pageSize]);
+
+  var totalPages = Math.max(1, Math.ceil(filteredTickets.length / pageSize));
+  var safeCurrentPage = Math.min(currentPage, totalPages);
+  var pagedTickets = filteredTickets.slice((safeCurrentPage - 1) * pageSize, safeCurrentPage * pageSize);
 
   var selectedTicket = tickets.find(function (t) { return t.id === selectedTicketId; }) || null;
 
@@ -712,7 +721,7 @@ function App({ onLogout }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredTickets.length ? filteredTickets.map(function (ticket) {
+                    {pagedTickets.length ? pagedTickets.map(function (ticket) {
                       var warn = getWarningLevel(ticket, nowMs);
                       var border = warn === "critical" ? "border-l-rose-500" : warn === "warning" ? "border-l-amber-400" : "border-l-transparent";
                       return (
@@ -743,7 +752,7 @@ function App({ onLogout }) {
 
               {/* ── Mobile Cards ── */}
               <div className="md:hidden divide-y divide-slate-100">
-                {filteredTickets.length ? filteredTickets.map(function (ticket) {
+                {pagedTickets.length ? pagedTickets.map(function (ticket) {
                   var warn = getWarningLevel(ticket, nowMs);
                   var border = warn === "critical" ? "border-l-rose-500" : warn === "warning" ? "border-l-amber-400" : "border-l-transparent";
                   return (
@@ -765,9 +774,31 @@ function App({ onLogout }) {
                 }) : <div className="p-8 text-center text-sm text-slate-400">{quickFilter === "none" ? "Select a filter above to view tickets." : "No tickets match your filters."}</div>}
               </div>
 
-              {/* Footer */}
-              <div className="px-5 py-3 border-t border-slate-100 text-xs text-slate-400">
-                Showing {filteredTickets.length} of {tickets.length} tickets &middot; Click a row to view details
+              {/* Footer with Pagination */}
+              <div className="px-5 py-3 border-t border-slate-100 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <span>Show</span>
+                  <select value={pageSize} onChange={function (e) { setPageSize(Number(e.target.value)); }} className="rounded-lg border border-slate-200 bg-slate-50/50 px-2 py-1 text-xs outline-none focus:border-indigo-400 transition">
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                  <span>per page &middot; {(safeCurrentPage - 1) * pageSize + 1}-{Math.min(safeCurrentPage * pageSize, filteredTickets.length)} of {filteredTickets.length} tickets</span>
+                </div>
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-1">
+                    <button type="button" disabled={safeCurrentPage <= 1} onClick={function () { setCurrentPage(safeCurrentPage - 1); }} className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-500 hover:bg-slate-50 transition disabled:opacity-30 disabled:cursor-not-allowed">&laquo; Prev</button>
+                    {Array.from({ length: totalPages }, function (_, i) { return i + 1; }).filter(function (p) { return p === 1 || p === totalPages || Math.abs(p - safeCurrentPage) <= 1; }).reduce(function (acc, p) {
+                      if (acc.length && p - acc[acc.length - 1] > 1) acc.push("...");
+                      acc.push(p);
+                      return acc;
+                    }, []).map(function (p, i) {
+                      if (p === "...") return <span key={"dot" + i} className="px-1.5 text-xs text-slate-300">...</span>;
+                      return <button key={p} type="button" onClick={function () { setCurrentPage(p); }} className={"rounded-lg px-2.5 py-1 text-xs font-medium transition " + (p === safeCurrentPage ? "bg-indigo-500 text-white shadow-sm" : "border border-slate-200 text-slate-500 hover:bg-slate-50")}>{p}</button>;
+                    })}
+                    <button type="button" disabled={safeCurrentPage >= totalPages} onClick={function () { setCurrentPage(safeCurrentPage + 1); }} className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-500 hover:bg-slate-50 transition disabled:opacity-30 disabled:cursor-not-allowed">Next &raquo;</button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
