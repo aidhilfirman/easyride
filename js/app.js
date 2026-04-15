@@ -125,15 +125,14 @@ function App({ onLogout }) {
   }, [tickets]);
 
   var summary = useMemo(function () {
-    var total = tickets.length;
-    var open = tickets.filter(function (t) { return t.status === "Open"; }).length;
-    var inProgress = tickets.filter(function (t) { return t.status === "In Progress"; }).length;
-    var escalated = tickets.filter(function (t) { return t.status === "Escalated"; }).length;
-    var resolved = tickets.filter(function (t) { return t.status === "Resolved"; }).length;
-    var resolvedList = tickets.filter(function (t) { return t.status === "Resolved"; });
-    var avgDays = resolvedList.length ? resolvedList.reduce(function (sum, t) { return sum + getDurationDays(t, nowMs); }, 0) / resolvedList.length : 0;
-    var unresolved = total - resolved;
-    return { total: total, open: open, inProgress: inProgress, escalated: escalated, resolved: resolved, avgDays: avgDays, unresolved: unresolved };
+    var open = 0, inProgress = 0, escalated = 0, resolved = 0, resolvedDays = 0;
+    tickets.forEach(function (t) {
+      if (t.status === "Open") open++;
+      else if (t.status === "In Progress") inProgress++;
+      else if (t.status === "Escalated") escalated++;
+      else if (t.status === "Resolved") { resolved++; resolvedDays += getDurationDays(t, nowMs); }
+    });
+    return { total: tickets.length, open: open, inProgress: inProgress, escalated: escalated, resolved: resolved, avgDays: resolved ? resolvedDays / resolved : 0, unresolved: tickets.length - resolved };
   }, [tickets, nowMs]);
 
   var monthOptions = useMemo(function () {
