@@ -156,6 +156,131 @@ function TicketDrawer({ ticket, onClose, onChange, onSave, onDelete, onAddCommen
   );
 }
 
+/* ── Ack Drawer (slide-out detail panel for acknowledgement tracker) ── */
+function AckDrawer({ entry, onClose, onChange, onSave, onDelete }) {
+  const [editing, setEditing] = useState(false);
+  useEffect(function () { setEditing(false); }, [entry ? entry.id : ""]);
+  if (!entry) return null;
+
+  var fc = "w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition ";
+  var fieldClass = fc + (editing ? "border-slate-200 bg-slate-50/50 focus:border-teal-400 focus:ring-1 focus:ring-teal-400" : "border-slate-100 bg-slate-50/30 text-slate-900 cursor-default");
+  var ro = !editing;
+
+  return (
+    <div className="fixed inset-0 z-40 flex">
+      <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative ml-auto flex h-full w-full max-w-2xl flex-col bg-white shadow-2xl overflow-hidden">
+        <div className="flex items-start justify-between border-b border-slate-100 px-6 py-5 shrink-0">
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge tone="bg-teal-50 text-teal-600 border-teal-200">{entry.id}</Badge>
+              {entry.confirmed ? <Badge tone="bg-emerald-50 text-emerald-600 border-emerald-200">Confirmed</Badge> : <Badge tone="bg-amber-50 text-amber-600 border-amber-200">Pending</Badge>}
+            </div>
+            <h2 className="mt-3 text-lg font-semibold text-slate-900 leading-snug">{entry.fullName || entry.shortName || "Unnamed Rider"}</h2>
+            <div className="mt-1 text-xs text-slate-400">Rider {entry.riderNo}</div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button type="button" onClick={function () { setEditing(!editing); }} className={"rounded-xl border px-3.5 py-2 text-sm font-medium transition " + (editing ? "border-teal-300 bg-teal-50 text-teal-600" : "border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-teal-300 hover:text-teal-600")}>
+              <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" /></svg>{editing ? "Editing" : "Edit"}
+            </button>
+            <button type="button" onClick={onClose} className="rounded-xl border border-slate-200 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+          {/* Rider Info */}
+          <div>
+            <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Rider Info</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Rider No.</div><input readOnly={ro} value={entry.riderNo || ""} onChange={(e) => onChange(entry.id, { riderNo: e.target.value })} className={fieldClass} /></label>
+              <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Short Name</div><input readOnly={ro} value={entry.shortName || ""} onChange={(e) => onChange(entry.id, { shortName: e.target.value })} className={fieldClass} /></label>
+              <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Full Name</div><input readOnly={ro} value={entry.fullName || ""} onChange={(e) => onChange(entry.id, { fullName: e.target.value })} className={fieldClass} /></label>
+            </div>
+          </div>
+          {/* Confirmation */}
+          <div>
+            <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Confirmation</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Confirmation</div><input readOnly={ro} value={entry.confirmation || ""} onChange={(e) => onChange(entry.id, { confirmation: e.target.value, confirmed: e.target.value.toLowerCase() === "yes" || e.target.value.toLowerCase() === "confirmed" || e.target.value.toLowerCase() === "done" })} placeholder={editing ? "e.g. Yes, No, Pending" : ""} className={fieldClass} /></label>
+              <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Reminder (1 Apr 2026)</div><input readOnly={ro} value={entry.reminderDate || ""} onChange={(e) => onChange(entry.id, { reminderDate: e.target.value })} className={fieldClass} /></label>
+            </div>
+          </div>
+          {/* Proof Reminders */}
+          <div>
+            <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Proof of Reminders</h4>
+            <div className="grid grid-cols-1 gap-4">
+              <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Reminder 1 — First Interview</div><input readOnly={ro} value={entry.proofReminder1 || ""} onChange={(e) => onChange(entry.id, { proofReminder1: e.target.value })} className={fieldClass} /></label>
+              <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Reminder 2 — Grab Account Setup</div><input readOnly={ro} value={entry.proofReminder2 || ""} onChange={(e) => onChange(entry.id, { proofReminder2: e.target.value })} className={fieldClass} /></label>
+              <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Reminder 3 — Co-Pilot Training / Group Chat</div><input readOnly={ro} value={entry.proofReminder3 || ""} onChange={(e) => onChange(entry.id, { proofReminder3: e.target.value })} className={fieldClass} /></label>
+            </div>
+          </div>
+          {/* Sign Off */}
+          <div>
+            <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Sign Off</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Eva Check</div><input readOnly={ro} value={entry.evaCheck || ""} onChange={(e) => onChange(entry.id, { evaCheck: e.target.value })} className={fieldClass} /></label>
+              <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Trainer & Checker Sign Off</div><input readOnly={ro} value={entry.trainerSignOff || ""} onChange={(e) => onChange(entry.id, { trainerSignOff: e.target.value })} className={fieldClass} /></label>
+            </div>
+          </div>
+        </div>
+        <div className="border-t border-slate-100 px-6 py-4 flex items-center justify-between gap-3 shrink-0">
+          <button type="button" onClick={function () { if (confirm("Delete this entry? This will also remove it from the spreadsheet.")) onDelete(entry.id); }} className="rounded-xl px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition">Delete</button>
+          {editing ? (
+            <button type="button" onClick={function () { onSave(entry.id); setEditing(false); onClose(); }} className="rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:shadow-md hover:brightness-110 transition-all">Save to Spreadsheet</button>
+          ) : (
+            <button type="button" onClick={onClose} className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition">Close</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Create Ack Modal ── */
+function CreateAckModal({ open, onClose, onCreate }) {
+  const emptyForm = { riderNo: "", shortName: "", fullName: "", confirmation: "", proofReminder1: "", proofReminder2: "", proofReminder3: "", reminderDate: "", evaCheck: "", trainerSignOff: "" };
+  const [form, setForm] = useState(emptyForm);
+  useEffect(function () { if (!open) setForm(emptyForm); }, [open]);
+  if (!open) return null;
+
+  const fieldClass = "w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-sm outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400 transition";
+  function set(key) { return function (e) { setForm(function (s) { var next = Object.assign({}, s); next[key] = e.target.value; return next; }); }; }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-start justify-between gap-3 mb-6">
+          <div>
+            <h3 className="text-xl font-bold text-slate-900">New Acknowledgement Entry</h3>
+            <p className="mt-1 text-sm text-slate-400">Track rider acknowledgement of critical time reminder</p>
+          </div>
+          <button type="button" onClick={onClose} className="rounded-xl border border-slate-200 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Rider No. *</div><input value={form.riderNo} onChange={set("riderNo")} className={fieldClass} /></label>
+          <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Short Name *</div><input value={form.shortName} onChange={set("shortName")} className={fieldClass} /></label>
+          <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-medium text-slate-600">Full Name</div><input value={form.fullName} onChange={set("fullName")} className={fieldClass} /></label>
+          <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Confirmation</div><input value={form.confirmation} onChange={set("confirmation")} placeholder="e.g. Yes, No, Pending" className={fieldClass} /></label>
+          <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Reminder (1 Apr 2026)</div><input value={form.reminderDate} onChange={set("reminderDate")} className={fieldClass} /></label>
+          <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-medium text-slate-600">Proof Reminder 1 — First Interview</div><input value={form.proofReminder1} onChange={set("proofReminder1")} className={fieldClass} /></label>
+          <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-medium text-slate-600">Proof Reminder 2 — Grab Account Setup</div><input value={form.proofReminder2} onChange={set("proofReminder2")} className={fieldClass} /></label>
+          <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-medium text-slate-600">Proof Reminder 3 — Co-Pilot Training / Group Chat</div><input value={form.proofReminder3} onChange={set("proofReminder3")} className={fieldClass} /></label>
+          <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Eva Check</div><input value={form.evaCheck} onChange={set("evaCheck")} className={fieldClass} /></label>
+          <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Trainer & Checker Sign Off</div><input value={form.trainerSignOff} onChange={set("trainerSignOff")} className={fieldClass} /></label>
+        </div>
+        <div className="mt-6 flex items-center justify-end gap-3">
+          <button type="button" onClick={onClose} className="rounded-xl px-4 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 transition">Cancel</button>
+          <button type="button" onClick={function () { if (!form.riderNo.trim() || !form.shortName.trim()) return; onCreate(form); onClose(); }} className="rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:shadow-md hover:brightness-110 transition-all">Create Entry</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Create Ticket Modal ── */
 function CreateTicketModal({ open, onClose, onCreate, staffOptions }) {
   const emptyForm = { riderNo: "", riderName: "", issue: "", timestampReceived: "", acknowledged: "", responsiblePerson: "", escalatedTo: "", solution: "", status: "Open", timestampSolved: "", duration: "" };

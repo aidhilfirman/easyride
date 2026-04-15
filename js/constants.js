@@ -85,3 +85,75 @@ function fetchSheetData() {
       });
     });
 }
+
+/* ── Acknowledgement Tracker (sheet: "Tracker of Acknowledgement rider of Trips") ── */
+var ACK_SHEET_NAME = "Tracker of Acknowledgement rider of Trips";
+
+/* Maps clean JS keys ↔ actual spreadsheet header names */
+var ACK_H = {
+  riderNo:        "Easyride Rider No.",
+  shortName:      "Short Name",
+  fullName:       "Full Name",
+  confirmation:   "Confirmation",
+  proofReminder1: "Proof Reminder 1 (During First Imterview)",
+  proofReminder2: "Proof Reminder 2 (During Grab Account Setup)",
+  proofReminder3: "Proof Reminder 3 (During Co-Pilot Training and in informed in Group chat)",
+  reminderDate:   "1 April 2026 11:59 AM",
+  evaCheck:       "Eva - 8 April 2044",
+  trainerSignOff: "Trainer and Checker Sign Off (Name - Day and Time)",
+};
+
+function ackToSheetData(entry) {
+  var d = { sheet: ACK_SHEET_NAME };
+  d[ACK_H.riderNo]        = entry.riderNo;
+  d[ACK_H.shortName]      = entry.shortName;
+  d[ACK_H.fullName]       = entry.fullName;
+  d[ACK_H.confirmation]   = entry.confirmation || "";
+  d[ACK_H.proofReminder1] = entry.proofReminder1 || "";
+  d[ACK_H.proofReminder2] = entry.proofReminder2 || "";
+  d[ACK_H.proofReminder3] = entry.proofReminder3 || "";
+  d[ACK_H.reminderDate]   = entry.reminderDate || "";
+  d[ACK_H.evaCheck]       = entry.evaCheck || "";
+  d[ACK_H.trainerSignOff] = entry.trainerSignOff || "";
+  return d;
+}
+
+function sendAckToSheet(entry) {
+  return sheetFetch(SHEET_URL, { method: "POST", body: JSON.stringify(ackToSheetData(entry)) });
+}
+
+function updateAckInSheet(entry) {
+  var data = ackToSheetData(entry);
+  data.action = "update";
+  data.row = entry.sheetRow;
+  return sheetFetch(SHEET_URL, { method: "POST", body: JSON.stringify(data) });
+}
+
+function deleteAckFromSheet(sheetRow) {
+  return sheetFetch(SHEET_URL, { method: "POST", body: JSON.stringify({ action: "delete", row: sheetRow, sheet: ACK_SHEET_NAME }) });
+}
+
+function fetchAckData() {
+  return sheetFetch(SHEET_URL + "?sheet=" + encodeURIComponent(ACK_SHEET_NAME))
+    .then(function (res) { return res.json(); })
+    .then(function (rows) {
+      return rows.map(function (row, index) {
+        var conf = String(row[ACK_H.confirmation] || "").trim().toLowerCase();
+        return {
+          sheetRow: index,
+          id: "ACK-" + String(index + 1).padStart(4, "0"),
+          riderNo:        row[ACK_H.riderNo] || "",
+          shortName:      row[ACK_H.shortName] || "",
+          fullName:       row[ACK_H.fullName] || "",
+          confirmation:   row[ACK_H.confirmation] || "",
+          confirmed:      conf === "yes" || conf === "done" || conf === "confirmed",
+          proofReminder1: row[ACK_H.proofReminder1] || "",
+          proofReminder2: row[ACK_H.proofReminder2] || "",
+          proofReminder3: row[ACK_H.proofReminder3] || "",
+          reminderDate:   row[ACK_H.reminderDate] || "",
+          evaCheck:       row[ACK_H.evaCheck] || "",
+          trainerSignOff: row[ACK_H.trainerSignOff] || "",
+        };
+      });
+    });
+}
