@@ -10,6 +10,7 @@ function App({ onLogout }) {
   const [monthFilter, setMonthFilter] = useState("All");
   const [quickFilter, setQuickFilter] = useState("all");
   const [sortBy, setSortBy] = useState("timestamp");
+  const [sortDir, setSortDir] = useState("desc");
   const [createOpen, setCreateOpen] = useState(false);
   const [pageSize, setPageSize] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
@@ -93,6 +94,7 @@ function App({ onLogout }) {
     setMonthFilter("All");
     setQuickFilter("all");
     setSortBy("timestamp");
+    setSortDir("desc");
     setCurrentPage(1);
     setSelectedTicketId("");
     setAckSearch("");
@@ -100,6 +102,11 @@ function App({ onLogout }) {
     setAckFilter("All");
     setAckSort("newest");
     setSelectedAckId("");
+  }
+
+  function toggleSort(col) {
+    if (sortBy === col) { setSortDir(sortDir === "asc" ? "desc" : "asc"); }
+    else { setSortBy(col); setSortDir(col === "duration" ? "desc" : "asc"); }
   }
 
   function openDashboard(options) {
@@ -156,17 +163,21 @@ function App({ onLogout }) {
     if (quickFilter === "unresolved") list = list.filter(function (t) { return t.status !== "Resolved"; });
     if (quickFilter === "escalated") list = list.filter(function (t) { return t.status === "Escalated"; });
     if (quickFilter === "my") list = list.filter(function (t) { return String(t.responsiblePerson || "").toLowerCase().indexOf(currentUser.toLowerCase()) !== -1; });
+    var dir = sortDir === "asc" ? 1 : -1;
     list.sort(function (a, b) {
-      if (sortBy === "status") return STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status);
-      if (sortBy === "duration") return getDurationDays(b, nowMs) - getDurationDays(a, nowMs);
-      var aT = toDate(a.timestampReceived) ? toDate(a.timestampReceived).getTime() : 0;
-      var bT = toDate(b.timestampReceived) ? toDate(b.timestampReceived).getTime() : 0;
-      return bT - aT;
+      var cmp = 0;
+      if (sortBy === "rider") cmp = (a.riderName || "").localeCompare(b.riderName || "");
+      else if (sortBy === "issue") cmp = (a.issue || "").localeCompare(b.issue || "");
+      else if (sortBy === "status") cmp = STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status);
+      else if (sortBy === "assigned") cmp = (a.responsiblePerson || "").localeCompare(b.responsiblePerson || "");
+      else if (sortBy === "duration") cmp = getDurationDays(a, nowMs) - getDurationDays(b, nowMs);
+      else { var aT = toDate(a.timestampReceived) ? toDate(a.timestampReceived).getTime() : 0; var bT = toDate(b.timestampReceived) ? toDate(b.timestampReceived).getTime() : 0; cmp = aT - bT; }
+      return cmp * dir;
     });
     return list;
-  }, [tickets, debouncedSearch, statusFilter, monthFilter, quickFilter, sortBy, nowMs, currentUser]);
+  }, [tickets, debouncedSearch, statusFilter, monthFilter, quickFilter, sortBy, sortDir, nowMs, currentUser]);
 
-  useEffect(function () { setCurrentPage(1); }, [debouncedSearch, statusFilter, monthFilter, quickFilter, sortBy, pageSize]);
+  useEffect(function () { setCurrentPage(1); }, [debouncedSearch, statusFilter, monthFilter, quickFilter, sortBy, sortDir, pageSize]);
 
   var totalPages = Math.max(1, Math.ceil(filteredTickets.length / pageSize));
   var safeCurrentPage = Math.min(currentPage, totalPages);
@@ -698,11 +709,7 @@ function App({ onLogout }) {
                       <option value="All">All Months</option>
                       {monthOptions.map(function (m) { var parts = m.split("-"); var label = new Date(parts[0], parts[1] - 1).toLocaleString("default", { month: "short", year: "numeric" }); return <option key={m} value={m}>{label}</option>; })}
                     </select>
-                    <select value={sortBy} onChange={function (e) { setSortBy(e.target.value); }} className="rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2.5 text-sm outline-none focus:border-indigo-400 transition">
-                      <option value="timestamp">Newest first</option>
-                      <option value="status">By Status</option>
-                      <option value="duration">By Duration</option>
-                    </select>
+                    <button type="button" onClick={function(){setSortBy("timestamp");setSortDir("desc");}} className={"rounded-xl border px-3 py-2.5 text-sm font-medium transition " + (sortBy === "timestamp" ? "border-indigo-300 bg-indigo-50 text-indigo-600" : "border-slate-200 bg-slate-50/50 text-slate-500 hover:bg-slate-100")}>Newest first</button>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mt-3">
@@ -717,11 +724,11 @@ function App({ onLogout }) {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-slate-100">
-                      <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Rider</th>
-                      <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Issue</th>
-                      <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Status</th>
-                      <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400 hidden lg:table-cell">Assigned</th>
-                      <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Duration</th>
+                      {[{k:"rider",l:"Rider"},{k:"issue",l:"Issue"},{k:"status",l:"Status"},{k:"assigned",l:"Assigned",h:"hidden lg:table-cell"},{k:"duration",l:"Duration"}].map(function(c){
+                        var active = sortBy === c.k;
+                        var arrow = active ? (sortDir === "asc" ? " \u2191" : " \u2193") : "";
+                        return <th key={c.k} onClick={function(){toggleSort(c.k);}} className={"px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide cursor-pointer select-none transition hover:text-indigo-500 " + (active ? "text-indigo-600" : "text-slate-400") + (c.h ? " "+c.h : "")}>{c.l}{arrow}</th>;
+                      })}
                     </tr>
                   </thead>
                   <tbody>
