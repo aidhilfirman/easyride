@@ -87,6 +87,7 @@ function fetchSheetData() {
 }
 
 /* ── Acknowledgement Tracker (sheet: "Tracker of Acknowledgement rider of Trips") ── */
+var ACK_SHEET_URL = "https://script.google.com/macros/s/AKfycbyPTtRzdjWFVAW-vji09SdBiwke6tUadvWSJsrjSYcp7ov_tRlReapty04k_jEXl4zY/exec";
 var ACK_SHEET_NAME = "Tracker of Acknowledgement rider of Trips";
 
 /* Maps clean JS keys ↔ actual spreadsheet header names */
@@ -98,7 +99,7 @@ var ACK_H = {
   proofReminder1: "Proof Reminder 1 (During First Imterview)",
   proofReminder2: "Proof Reminder 2 (During Grab Account Setup)",
   proofReminder3: "Proof Reminder 3 (During Co-Pilot Training and in informed in Group chat)",
-  reminderDate:   "1 April 2026 11:59 AM",
+  reminderDate:   "Wed Apr 01 2026 11:59:00 GMT+0700 (Waktu Indochina)",
   evaCheck:       "Eva - 8 April 2044",
   trainerSignOff: "Trainer and Checker Sign Off (Name - Day and Time)",
 };
@@ -119,22 +120,22 @@ function ackToSheetData(entry) {
 }
 
 function sendAckToSheet(entry) {
-  return sheetFetch(SHEET_URL, { method: "POST", body: JSON.stringify(ackToSheetData(entry)) });
+  return sheetFetch(ACK_SHEET_URL, { method: "POST", body: JSON.stringify(ackToSheetData(entry)) });
 }
 
 function updateAckInSheet(entry) {
   var data = ackToSheetData(entry);
   data.action = "update";
   data.row = entry.sheetRow;
-  return sheetFetch(SHEET_URL, { method: "POST", body: JSON.stringify(data) });
+  return sheetFetch(ACK_SHEET_URL, { method: "POST", body: JSON.stringify(data) });
 }
 
 function deleteAckFromSheet(sheetRow) {
-  return sheetFetch(SHEET_URL, { method: "POST", body: JSON.stringify({ action: "delete", row: sheetRow, sheet: ACK_SHEET_NAME }) });
+  return sheetFetch(ACK_SHEET_URL, { method: "POST", body: JSON.stringify({ action: "delete", row: sheetRow, sheet: ACK_SHEET_NAME }) });
 }
 
 function fetchAckData() {
-  return sheetFetch(SHEET_URL + "?sheet=" + encodeURIComponent(ACK_SHEET_NAME))
+  return sheetFetch(ACK_SHEET_URL + "?sheet=" + encodeURIComponent(ACK_SHEET_NAME))
     .then(function (res) { return res.json(); })
     .then(function (rows) {
       return rows.map(function (row, index) {
