@@ -23,6 +23,7 @@ function App({ onLogout }) {
   const [ackSearch, setAckSearch] = useState("");
   const [debouncedAckSearch, setDebouncedAckSearch] = useState("");
   const [ackFilter, setAckFilter] = useState("All");
+  const [ackSort, setAckSort] = useState("newest");
   const [ackCreateOpen, setAckCreateOpen] = useState(false);
 
   useEffect(function () {
@@ -94,6 +95,7 @@ function App({ onLogout }) {
     setAckSearch("");
     setDebouncedAckSearch("");
     setAckFilter("All");
+    setAckSort("newest");
     setSelectedAckId("");
   }
 
@@ -255,9 +257,17 @@ function App({ onLogout }) {
     }
     if (ackFilter === "Confirmed") list = list.filter(function (e) { return e.confirmed; });
     if (ackFilter === "Pending") list = list.filter(function (e) { return !e.confirmed; });
-    list.sort(function (a, b) { return b.sheetRow - a.sheetRow; });
+    if (ackSort === "rider-asc" || ackSort === "rider-desc") {
+      list.sort(function (a, b) {
+        var na = parseInt(String(a.riderNo).replace(/\D/g, "")) || 0;
+        var nb = parseInt(String(b.riderNo).replace(/\D/g, "")) || 0;
+        return ackSort === "rider-asc" ? na - nb : nb - na;
+      });
+    } else {
+      list.sort(function (a, b) { return b.sheetRow - a.sheetRow; });
+    }
     return list;
-  }, [ackEntries, debouncedAckSearch, ackFilter]);
+  }, [ackEntries, debouncedAckSearch, ackFilter, ackSort]);
 
   var selectedAck = ackEntries.find(function (e) { return e.id === selectedAckId; }) || null;
 
@@ -483,6 +493,11 @@ function App({ onLogout }) {
                     <option value="All">All</option>
                     <option value="Confirmed">Confirmed</option>
                     <option value="Pending">Pending</option>
+                  </select>
+                  <select value={ackSort} onChange={function (e) { setAckSort(e.target.value); }} className="rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2.5 text-sm outline-none focus:border-teal-400 transition">
+                    <option value="newest">Newest First</option>
+                    <option value="rider-asc">Rider No. ↑</option>
+                    <option value="rider-desc">Rider No. ↓</option>
                   </select>
                 </div>
               </div>
