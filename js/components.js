@@ -210,9 +210,26 @@ function AckDrawer({ entry, onClose, onChange, onSave, onDelete }) {
           <div>
             <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Proof of Reminders</h4>
             <div className="grid grid-cols-1 gap-4">
-              <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Reminder 1 — First Interview</div><input readOnly={ro} value={entry.proofReminder1 || ""} onChange={(e) => onChange(entry.id, { proofReminder1: e.target.value })} className={fieldClass} /></label>
-              <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Reminder 2 — Grab Account Setup</div><input readOnly={ro} value={entry.proofReminder2 || ""} onChange={(e) => onChange(entry.id, { proofReminder2: e.target.value })} className={fieldClass} /></label>
-              <label className="text-sm"><div className="mb-1.5 font-medium text-slate-600">Reminder 3 — Co-Pilot Training / Group Chat</div><input readOnly={ro} value={entry.proofReminder3 || ""} onChange={(e) => onChange(entry.id, { proofReminder3: e.target.value })} className={fieldClass} /></label>
+              {[
+                { key: "proofReminder1", label: "Reminder 1 — First Interview" },
+                { key: "proofReminder2", label: "Reminder 2 — Grab Account Setup" },
+                { key: "proofReminder3", label: "Reminder 3 — Co-Pilot Training / Group Chat" },
+              ].map(function (f) {
+                var val = entry[f.key] || "";
+                var isImage = val && typeof val === "string" && (val.startsWith("http") && (val.includes("googleusercontent.com") || val.match(/\.(png|jpg|jpeg|gif|webp)/i)));
+                return (
+                  <div key={f.key} className="text-sm">
+                    <div className="mb-1.5 font-medium text-slate-600">{f.label}</div>
+                    {isImage ? (
+                      <a href={val} target="_blank" rel="noopener noreferrer">
+                        <img src={val} alt={f.label} className="max-w-full max-h-48 rounded-xl border border-slate-200 object-contain cursor-pointer hover:shadow-lg transition" />
+                      </a>
+                    ) : (
+                      <input readOnly={ro} value={val} onChange={(e) => onChange(entry.id, { [f.key]: e.target.value })} className={fieldClass} />
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
           {/* Sign Off */}
