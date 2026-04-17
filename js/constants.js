@@ -1,10 +1,10 @@
 const STATUS_ORDER = ["Open", "In Progress", "Escalated", "Resolved"];
 
 const STATUS_STYLES = {
-  Open: "bg-slate-100 text-slate-600 border-slate-200",
-  "In Progress": "bg-blue-50 text-blue-600 border-blue-200",
-  Escalated: "bg-amber-50 text-amber-700 border-amber-200",
-  Resolved: "bg-emerald-50 text-emerald-600 border-emerald-200",
+  Open: "bg-slate-100/80 text-slate-700 border-slate-200/60",
+  "In Progress": "bg-blue-500/10 text-blue-600 border-blue-300/40",
+  Escalated: "bg-amber-500/10 text-amber-700 border-amber-300/40",
+  Resolved: "bg-emerald-500/10 text-emerald-600 border-emerald-300/40",
 };
 
 const STAFF_LIST = ["Nora", "Amy", "Aqilah", "Dominic", "Zaid", "Hanif", "Alex", "Mike"];
