@@ -469,58 +469,59 @@ function App({ onLogout }) {
     ];
 
     return (
-      <div className={pageAnim + " min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden"}>
-        {/* Background decorations */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-1/4 -right-20 w-[400px] h-[400px] bg-violet-500/5 rounded-full blur-3xl"></div>
-          <div className="absolute top-10 right-1/4 w-[300px] h-[300px] bg-teal-500/5 rounded-full blur-3xl"></div>
-        </div>
+      <React.Fragment>
+        <div className={pageAnim + " min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden"}>
+          {/* Background decorations */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-1/4 -right-20 w-[400px] h-[400px] bg-violet-500/5 rounded-full blur-3xl"></div>
+            <div className="absolute top-10 right-1/4 w-[300px] h-[300px] bg-teal-500/5 rounded-full blur-3xl"></div>
+          </div>
 
-        <div className="relative z-10 flex flex-col items-center">
-          {/* Logo + Greeting */}
-          <div className="animate-fadeIn w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-3xl font-extrabold flex items-center justify-center shadow-2xl shadow-indigo-500/30 mb-6 ring-4 ring-white/10">ER</div>
-          <h1 className="animate-fadeIn stagger-1 text-3xl md:text-4xl font-extrabold text-white tracking-tight">{greeting}</h1>
-          <p className="animate-fadeIn stagger-2 mt-2 text-slate-400 text-sm font-medium">What would you like to do?</p>
+          <div className="relative z-10 flex flex-col items-center">
+            {/* Logo + Greeting */}
+            <div className="animate-fadeIn w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-3xl font-extrabold flex items-center justify-center shadow-2xl shadow-indigo-500/30 mb-6 ring-4 ring-white/10">ER</div>
+            <h1 className="animate-fadeIn stagger-1 text-3xl md:text-4xl font-extrabold text-white tracking-tight">{greeting}</h1>
+            <p className="animate-fadeIn stagger-2 mt-2 text-slate-400 text-sm font-medium">What would you like to do?</p>
 
-          {/* Menu Grid */}
-          <div className="grid grid-cols-2 gap-4 mt-10 w-full max-w-lg">
-            {tiles.map(function (t, i) {
-              var isLast = tiles.length % 2 === 1 && i === tiles.length - 1;
-              return (
-                <button key={t.title} onClick={t.action} className={"animate-fadeIn group relative p-5 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm text-left hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.97] transition-all duration-300" + (isLast ? " col-span-2" : "")} style={{ animationDelay: (0.1 + i * 0.05) + "s" }}>
-                  <div className="relative">
-                    <div className={"w-11 h-11 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-300 " + t.iconBg}>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={t.icon} /></svg>
+            {/* Menu Grid */}
+            <div className="grid grid-cols-2 gap-4 mt-10 w-full max-w-lg">
+              {tiles.map(function (t, i) {
+                var isLast = tiles.length % 2 === 1 && i === tiles.length - 1;
+                return (
+                  <button key={t.title} onClick={t.action} className={"animate-fadeIn group relative p-5 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm text-left hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.97] transition-all duration-300" + (isLast ? " col-span-2" : "")} style={{ animationDelay: (0.1 + i * 0.05) + "s" }}>
+                    <div className="relative">
+                      <div className={"w-11 h-11 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-300 " + t.iconBg}>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={t.icon} /></svg>
+                      </div>
+                      <div className="text-[15px] font-bold text-white">{t.title}</div>
+                      <div className="mt-0.5 text-xs text-slate-400 font-medium">{t.desc}</div>
+                      <div className="mt-3"><span className="text-2xl font-extrabold text-white">{t.count}</span><span className="ml-1.5 text-xs text-slate-400 font-medium">{t.label}</span></div>
                     </div>
-                    <div className="text-[15px] font-bold text-white">{t.title}</div>
-                    <div className="mt-0.5 text-xs text-slate-400 font-medium">{t.desc}</div>
-                    <div className="mt-3"><span className="text-2xl font-extrabold text-white">{t.count}</span><span className="ml-1.5 text-xs text-slate-400 font-medium">{t.label}</span></div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+                  </button>
+                );
+              })}
+            </div>
 
-          {/* Quick stats */}
-          <div className="animate-fadeIn mt-8 flex items-center gap-6 text-xs text-slate-500 font-medium" style={{ animationDelay: "0.4s" }}>
-            <span><span className="font-bold text-slate-300">{summary.open}</span> open</span>
-            <span className="w-1 h-1 rounded-full bg-slate-600" />
-            <span><span className="font-bold text-slate-300">{summary.inProgress}</span> in progress</span>
-            <span className="w-1 h-1 rounded-full bg-slate-600" />
-            <span><span className="font-bold text-slate-300">{summary.resolved}</span> resolved</span>
-          </div>
+            {/* Quick stats */}
+            <div className="animate-fadeIn mt-8 flex items-center gap-6 text-xs text-slate-500 font-medium" style={{ animationDelay: "0.4s" }}>
+              <span><span className="font-bold text-slate-300">{summary.open}</span> open</span>
+              <span className="w-1 h-1 rounded-full bg-slate-600" />
+              <span><span className="font-bold text-slate-300">{summary.inProgress}</span> in progress</span>
+              <span className="w-1 h-1 rounded-full bg-slate-600" />
+              <span><span className="font-bold text-slate-300">{summary.resolved}</span> resolved</span>
+            </div>
 
-          {/* Sign Out */}
-          <button onClick={onLogout} className="animate-fadeIn mt-10 flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-slate-400 hover:text-red-400 hover:border-red-500/30 hover:bg-red-500/10 transition-all duration-300" style={{ animationDelay: "0.45s" }}>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-            Sign Out
-          </button>
+            {/* Sign Out */}
+            <button onClick={onLogout} className="animate-fadeIn mt-10 flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-slate-400 hover:text-red-400 hover:border-red-500/30 hover:bg-red-500/10 transition-all duration-300" style={{ animationDelay: "0.45s" }}>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+              Sign Out
+            </button>
+          </div>
         </div>
-
         <CreateTicketModal open={createOpen} onClose={function () { setCreateOpen(false); }} onCreate={createTicket} staffOptions={staffOptions} />
         <Toasts items={toasts} />
-      </div>
+      </React.Fragment>
     );
   }
 
