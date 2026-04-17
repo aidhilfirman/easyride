@@ -284,7 +284,7 @@ function CreateAckModal({ open, onClose, onCreate }) {
   function set(key) { return function (e) { setForm(function (s) { var next = Object.assign({}, s); next[key] = e.target.value; return next; }); }; }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-8 px-3 pb-3 overflow-y-auto">
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} style={{ animation: "fadeIn 0.2s ease-out" }} />
       <div className="animate-slideUp relative w-full max-w-xl rounded-2xl bg-white p-5 shadow-2xl max-h-[95vh] overflow-y-auto">
         <div className="flex items-center justify-between gap-3 mb-4">
@@ -326,7 +326,7 @@ function CreateTicketModal({ open, onClose, onCreate, staffOptions }) {
   function set(key) { return function (e) { setForm(function (s) { var next = Object.assign({}, s); next[key] = e.target.value; return next; }); }; }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-8 px-3 pb-3 overflow-y-auto">
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} style={{ animation: "fadeIn 0.2s ease-out" }} />
       <div className="animate-slideUp relative w-full max-w-xl rounded-2xl bg-white p-5 shadow-2xl max-h-[95vh] overflow-y-auto">
         <div className="flex items-center justify-between gap-3 mb-4">
