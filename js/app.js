@@ -17,7 +17,7 @@ function App({ onLogout }) {
   const [currentUser, setCurrentUser] = useState("You");
   const [nowMs, setNowMs] = useState(Date.now());
   const [toasts, setToasts] = useState([]);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [pageAnim, setPageAnim] = useState("");
 
   /* ── Ack Tracker state ── */
   const [ackEntries, setAckEntries] = useState([]);
@@ -87,22 +87,27 @@ function App({ onLogout }) {
     setTimeout(function () { setToasts(function (prev) { return prev.filter(function (t) { return t.id !== id; }); }); }, 3000);
   }
 
+  function navigateTo(target, beforeSwap) {
+    var fromHome = page === "home";
+    var toHome = target === "home";
+    var exitCls = fromHome ? "page-exit-left" : toHome ? "page-exit-right" : "page-exit-fade";
+    var enterCls = toHome ? "page-enter-center" : fromHome ? "page-enter-right" : "page-enter-fade";
+    var delay = fromHome || toHome ? 200 : 150;
+    setPageAnim(exitCls);
+    setTimeout(function () {
+      if (beforeSwap) beforeSwap();
+      setPage(target);
+      setPageAnim(enterCls);
+    }, delay);
+  }
+
   function goHome() {
-    setPage("home");
-    setSearch("");
-    setDebouncedSearch("");
-    setStatusFilter("All");
-    setMonthFilter("All");
-    setQuickFilter("all");
-    setSortBy("timestamp");
-    setSortDir("desc");
-    setCurrentPage(1);
-    setSelectedTicketId("");
-    setAckSearch("");
-    setDebouncedAckSearch("");
-    setAckFilter("All");
-    setAckSort("newest");
-    setSelectedAckId("");
+    navigateTo("home", function () {
+      setSearch(""); setDebouncedSearch(""); setStatusFilter("All"); setMonthFilter("All");
+      setQuickFilter("all"); setSortBy("timestamp"); setSortDir("desc"); setCurrentPage(1);
+      setSelectedTicketId(""); setAckSearch(""); setDebouncedAckSearch("");
+      setAckFilter("All"); setAckSort("newest"); setSelectedAckId("");
+    });
   }
 
   function toggleSort(col) {
@@ -111,9 +116,14 @@ function App({ onLogout }) {
   }
 
   function openDashboard(options) {
-    if (options && options.quickFilter) setQuickFilter(options.quickFilter);
-    if (options && options.createOpen) setCreateOpen(true);
-    setPage("dashboard");
+    navigateTo("dashboard", function () {
+      if (options && options.quickFilter) setQuickFilter(options.quickFilter);
+      if (options && options.createOpen) setCreateOpen(true);
+    });
+  }
+
+  function openAck() {
+    navigateTo("ack");
   }
 
   var staffOptions = useMemo(function () {
@@ -369,7 +379,7 @@ function App({ onLogout }) {
             Support Tracker
             {summary.unresolved > 0 && <span className="ml-auto text-[10px] font-bold bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full">{summary.unresolved}</span>}
           </button>
-          <button onClick={function () { setPage("ack"); }} className={"w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 " + (activePage === "ack" ? "bg-teal-500/20 text-teal-300 shadow-sm" : "text-slate-400 hover:bg-white/5 hover:text-slate-200")}>
+          <button onClick={function () { openAck(); }} className={"w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 " + (activePage === "ack" ? "bg-teal-500/20 text-teal-300 shadow-sm" : "text-slate-400 hover:bg-white/5 hover:text-slate-200")}>
             <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             Trips Ack Tracker
             {ackSummary.pending > 0 && <span className="ml-auto text-[10px] font-bold bg-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full">{ackSummary.pending}</span>}
@@ -453,13 +463,13 @@ function App({ onLogout }) {
       { action: function () { openDashboard(); }, title: "Analytics", desc: "Resolution performance", count: summary.avgDays > 0 ? summary.avgDays.toFixed(1) + "d" : "\u2014", label: "avg resolve",
         gradient: "from-emerald-500 to-teal-600", iconBg: "bg-emerald-500/10 text-emerald-500",
         icon: "M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" },
-      { action: function () { setPage("ack"); }, title: "Trip Ack Tracker", desc: "Critical time reminders", count: ackSummary.pending, label: "pending",
+      { action: function () { openAck(); }, title: "Trip Ack Tracker", desc: "Critical time reminders", count: ackSummary.pending, label: "pending",
         gradient: "from-teal-500 to-cyan-600", iconBg: "bg-teal-500/10 text-teal-500",
         icon: "M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
     ];
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
+      <div className={pageAnim + " min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden"}>
         {/* Background decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-3xl"></div>
@@ -478,7 +488,7 @@ function App({ onLogout }) {
             {tiles.map(function (t, i) {
               var isLast = tiles.length % 2 === 1 && i === tiles.length - 1;
               return (
-                <button key={t.title} onClick={t.action} className={"animate-fadeIn group relative p-5 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm text-left hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300" + (isLast ? " col-span-2" : "")} style={{ animationDelay: (0.1 + i * 0.05) + "s" }}>
+                <button key={t.title} onClick={t.action} className={"animate-fadeIn group relative p-5 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm text-left hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.97] transition-all duration-300" + (isLast ? " col-span-2" : "")} style={{ animationDelay: (0.1 + i * 0.05) + "s" }}>
                   <div className="relative">
                     <div className={"w-11 h-11 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-300 " + t.iconBg}>
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={t.icon} /></svg>
@@ -517,7 +527,7 @@ function App({ onLogout }) {
      ACK TRACKER — acknowledgement tracking view
      ════════════════════════════════════════════════ */
   if (page === "ack") return (
-    <div className="min-h-screen bg-slate-50/50 text-slate-900">
+    <div className={pageAnim + " min-h-screen bg-slate-50/50 text-slate-900"}>
       <MobileHeader title="Trip Ack Tracker" accentColor="teal" />
 
       <div className="flex min-h-screen">
@@ -533,7 +543,7 @@ function App({ onLogout }) {
                 <p className="mt-1 text-sm text-slate-400 font-medium">{filteredAck.length} of {ackEntries.length} entries</p>
               </div>
               <div className="flex gap-2 self-start sm:self-auto">
-                <button type="button" onClick={function () { setAckCreateOpen(true); }} className="rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-xl hover:brightness-110 transition-all duration-300">+ New Entry</button>
+                <button type="button" onClick={function () { setAckCreateOpen(true); }} className="rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-xl hover:brightness-110 active:scale-[0.97] transition-all duration-300">+ New Entry</button>
               </div>
             </div>
 
@@ -655,7 +665,7 @@ function App({ onLogout }) {
   var chartMax = Math.max(summary.open, summary.inProgress, summary.escalated, summary.resolved, 1);
 
   return (
-    <div className="min-h-screen bg-slate-50/50 text-slate-900">
+    <div className={pageAnim + " min-h-screen bg-slate-50/50 text-slate-900"}>
       <MobileHeader title="EasyRide" accentColor="indigo" />
 
       <div className="flex min-h-screen">
@@ -672,10 +682,10 @@ function App({ onLogout }) {
                 <p className="mt-1 text-sm text-slate-400 font-medium">{filteredTickets.length} of {tickets.length} tickets</p>
               </div>
               <div className="flex gap-2 self-start sm:self-auto">
-                <button type="button" onClick={exportCSV} className="rounded-xl border border-slate-200/60 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm transition-all duration-200">
+                <button type="button" onClick={exportCSV} className="rounded-xl border border-slate-200/60 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm active:scale-[0.97] transition-all duration-200">
                   <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>Export
                 </button>
-                <button type="button" onClick={function () { setCreateOpen(true); }} className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-xl hover:brightness-110 transition-all duration-300">+ New Ticket</button>
+                <button type="button" onClick={function () { setCreateOpen(true); }} className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-xl hover:brightness-110 active:scale-[0.97] transition-all duration-300">+ New Ticket</button>
               </div>
             </div>
 

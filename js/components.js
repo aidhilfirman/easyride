@@ -163,7 +163,7 @@ function TicketDrawer({ ticket, onClose, onChange, onSave, onDelete, onAddCommen
         <div className="border-t border-slate-100/80 px-6 py-4 flex items-center justify-between gap-3 shrink-0 bg-slate-50/30">
           <button type="button" onClick={function () { if (confirm("Delete this ticket? This will also remove it from the spreadsheet.")) onDelete(ticket.id); }} className="rounded-xl px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-all duration-200">Delete</button>
           {editing ? (
-            <button type="button" onClick={function () { onSave(ticket.id); setEditing(false); onClose(); }} className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-xl hover:brightness-110 transition-all duration-300">Save to Spreadsheet</button>
+            <button type="button" onClick={function () { onSave(ticket.id); setEditing(false); onClose(); }} className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-xl hover:brightness-110 active:scale-[0.97] transition-all duration-300">Save to Spreadsheet</button>
           ) : (
             <button type="button" onClick={onClose} className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all duration-200">Close</button>
           )}</div>
@@ -262,7 +262,7 @@ function AckDrawer({ entry, onClose, onChange, onSave, onDelete }) {
         <div className="border-t border-slate-100/80 px-6 py-4 flex items-center justify-between gap-3 shrink-0 bg-slate-50/30">
           <button type="button" onClick={function () { if (confirm("Delete this entry? This will also remove it from the spreadsheet.")) onDelete(entry.id); }} className="rounded-xl px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-all duration-200">Delete</button>
           {editing ? (
-            <button type="button" onClick={function () { onSave(entry.id); setEditing(false); onClose(); }} className="rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-xl hover:brightness-110 transition-all duration-300">Save to Spreadsheet</button>
+            <button type="button" onClick={function () { onSave(entry.id); setEditing(false); onClose(); }} className="rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-xl hover:brightness-110 active:scale-[0.97] transition-all duration-300">Save to Spreadsheet</button>
           ) : (
             <button type="button" onClick={onClose} className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all duration-200">Close</button>
           )}
@@ -309,7 +309,7 @@ function CreateAckModal({ open, onClose, onCreate }) {
         </div>
         <div className="mt-6 flex items-center justify-end gap-3">
           <button type="button" onClick={onClose} className="rounded-xl px-4 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 transition-all duration-200">Cancel</button>
-          <button type="button" onClick={function () { if (!form.riderNo.trim() || !form.shortName.trim()) return; onCreate(form); onClose(); }} className="rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-xl hover:brightness-110 transition-all duration-300">Create Entry</button>
+          <button type="button" onClick={function () { if (!form.riderNo.trim() || !form.shortName.trim()) return; onCreate(form); onClose(); }} className="rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-xl hover:brightness-110 active:scale-[0.97] transition-all duration-300">Create Entry</button>
         </div>
       </div>
     </div>
@@ -354,7 +354,7 @@ function CreateTicketModal({ open, onClose, onCreate, staffOptions }) {
         </div>
         <div className="mt-6 flex items-center justify-end gap-3">
           <button type="button" onClick={onClose} className="rounded-xl px-4 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 transition-all duration-200">Cancel</button>
-          <button type="button" onClick={function () { if (!form.riderNo.trim() || !form.riderName.trim() || !form.issue.trim()) return; onCreate(form); onClose(); }} className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-xl hover:brightness-110 transition-all duration-300">Create Ticket</button>
+          <button type="button" onClick={function () { if (!form.riderNo.trim() || !form.riderName.trim() || !form.issue.trim()) return; onCreate(form); onClose(); }} className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-xl hover:brightness-110 active:scale-[0.97] transition-all duration-300">Create Ticket</button>
         </div>
         <datalist id="staff-opts-create">{staffOptions.map(function (n) { return <option key={n} value={n} />; })}</datalist>
       </div>

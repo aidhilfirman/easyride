@@ -52,7 +52,7 @@ function LoginPage({ onLogin }) {
             <div className="mb-1.5 font-semibold text-slate-300 text-xs uppercase tracking-wider">Password</div>
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 6 characters" className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200" />
           </label>
-          <button type="submit" disabled={loading} className="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-3 text-sm font-bold text-white shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:brightness-110 disabled:opacity-50 transition-all duration-300">
+          <button type="submit" disabled={loading} className="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-3 text-sm font-bold text-white shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:brightness-110 active:scale-[0.97] disabled:opacity-50 transition-all duration-300">
             {loading ? "Please wait..." : isRegister ? "Create Account" : "Sign In"}
           </button>
           <p className="mt-5 text-center text-sm text-slate-400">

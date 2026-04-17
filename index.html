@@ -31,10 +31,19 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 .stagger-1 { animation-delay: 0.05s; }
 .stagger-2 { animation-delay: 0.1s; }
 .stagger-3 { animation-delay: 0.15s; }
-.stagger-4 { animation-delay: 0.2s; }
-.stagger-5 { animation-delay: 0.25s; }
-/* Glass card */
-.glass-card { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+/* Page transitions (GPU-accelerated) */
+@keyframes pageExitLeft { to { opacity: 0; transform: translateX(-50px) scale(0.97); } }
+@keyframes pageEnterRight { from { opacity: 0; transform: translateX(50px) scale(0.97); } }
+@keyframes pageExitRight { to { opacity: 0; transform: translateX(50px) scale(0.97); } }
+@keyframes pageEnterCenter { from { opacity: 0; transform: scale(0.95); } }
+@keyframes pageExitFade { to { opacity: 0; transform: scale(0.98); } }
+@keyframes pageEnterFade { from { opacity: 0; transform: scale(0.98); } }
+.page-exit-left { animation: pageExitLeft 0.2s ease-in both; }
+.page-exit-right { animation: pageExitRight 0.2s ease-in both; }
+.page-exit-fade { animation: pageExitFade 0.15s ease-in both; }
+.page-enter-right { animation: pageEnterRight 0.3s ease-out both; }
+.page-enter-center { animation: pageEnterCenter 0.3s ease-out both; }
+.page-enter-fade { animation: pageEnterFade 0.25s ease-out both; }
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
