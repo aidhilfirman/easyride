@@ -279,37 +279,35 @@ function CreateAckModal({ open, onClose, onCreate }) {
   useEffect(function () { if (!open) setForm(emptyForm); }, [open]);
   if (!open) return null;
 
-  const fieldClass = "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all duration-200";
+  const f = "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all duration-200";
+  const lb = "mb-1 font-semibold text-slate-500 text-[10px] uppercase tracking-wider";
   function set(key) { return function (e) { setForm(function (s) { var next = Object.assign({}, s); next[key] = e.target.value; return next; }); }; }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3">
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} style={{ animation: "fadeIn 0.2s ease-out" }} />
-      <div className="animate-slideUp relative w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-start justify-between gap-3 mb-6">
-          <div>
-            <h3 className="text-xl font-bold text-slate-900">New Acknowledgement Entry</h3>
-            <p className="mt-1 text-sm text-slate-400">Track rider acknowledgement of critical time reminder</p>
-          </div>
-          <button type="button" onClick={onClose} className="rounded-xl border border-slate-200 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all duration-200">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+      <div className="animate-slideUp relative w-full max-w-xl rounded-2xl bg-white p-5 shadow-2xl max-h-[95vh] overflow-y-auto">
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <h3 className="text-lg font-bold text-slate-900">New Acknowledgement Entry</h3>
+          <button type="button" onClick={onClose} className="rounded-lg border border-slate-200 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all duration-200">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <label className="text-sm"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Rider No. *</div><input value={form.riderNo} onChange={set("riderNo")} className={fieldClass} /></label>
-          <label className="text-sm"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Short Name *</div><input value={form.shortName} onChange={set("shortName")} className={fieldClass} /></label>
-          <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Full Name</div><input value={form.fullName} onChange={set("fullName")} className={fieldClass} /></label>
-          <label className="text-sm"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Confirmation</div><input value={form.confirmation} onChange={set("confirmation")} placeholder="e.g. Yes, No, Pending" className={fieldClass} /></label>
-          <label className="text-sm"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Reminder (1 Apr 2026)</div><input value={form.reminderDate} onChange={set("reminderDate")} className={fieldClass} /></label>
-          <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Proof Reminder 1 — First Interview</div><input value={form.proofReminder1} onChange={set("proofReminder1")} className={fieldClass} /></label>
-          <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Proof Reminder 2 — Grab Account Setup</div><input value={form.proofReminder2} onChange={set("proofReminder2")} className={fieldClass} /></label>
-          <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Proof Reminder 3 — Co-Pilot Training / Group Chat</div><input value={form.proofReminder3} onChange={set("proofReminder3")} className={fieldClass} /></label>
-          <label className="text-sm"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Eva Check</div><input value={form.evaCheck} onChange={set("evaCheck")} className={fieldClass} /></label>
-          <label className="text-sm"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Trainer & Checker Sign Off</div><input value={form.trainerSignOff} onChange={set("trainerSignOff")} className={fieldClass} /></label>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <label className="text-sm"><div className={lb}>Rider No. *</div><input value={form.riderNo} onChange={set("riderNo")} className={f} /></label>
+          <label className="text-sm"><div className={lb}>Short Name *</div><input value={form.shortName} onChange={set("shortName")} className={f} /></label>
+          <label className="text-sm sm:col-span-2"><div className={lb}>Full Name</div><input value={form.fullName} onChange={set("fullName")} className={f} /></label>
+          <label className="text-sm"><div className={lb}>Confirmation</div><input value={form.confirmation} onChange={set("confirmation")} placeholder="e.g. Yes, No, Pending" className={f} /></label>
+          <label className="text-sm"><div className={lb}>Reminder (1 Apr 2026)</div><input value={form.reminderDate} onChange={set("reminderDate")} className={f} /></label>
+          <label className="text-sm sm:col-span-2"><div className={lb}>Proof 1 — First Interview</div><input value={form.proofReminder1} onChange={set("proofReminder1")} className={f} /></label>
+          <label className="text-sm sm:col-span-2"><div className={lb}>Proof 2 — Grab Account Setup</div><input value={form.proofReminder2} onChange={set("proofReminder2")} className={f} /></label>
+          <label className="text-sm sm:col-span-2"><div className={lb}>Proof 3 — Co-Pilot / Group Chat</div><input value={form.proofReminder3} onChange={set("proofReminder3")} className={f} /></label>
+          <label className="text-sm"><div className={lb}>Eva Check</div><input value={form.evaCheck} onChange={set("evaCheck")} className={f} /></label>
+          <label className="text-sm"><div className={lb}>Trainer & Checker Sign Off</div><input value={form.trainerSignOff} onChange={set("trainerSignOff")} className={f} /></label>
         </div>
-        <div className="mt-6 flex items-center justify-end gap-3">
-          <button type="button" onClick={onClose} className="rounded-xl px-4 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 transition-all duration-200">Cancel</button>
-          <button type="button" onClick={function () { if (!form.riderNo.trim() || !form.shortName.trim()) return; onCreate(form); onClose(); }} className="rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-xl hover:brightness-110 active:scale-[0.97] transition-all duration-300">Create Entry</button>
+        <div className="mt-4 flex items-center justify-end gap-3">
+          <button type="button" onClick={onClose} className="rounded-xl px-4 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50 transition-all duration-200">Cancel</button>
+          <button type="button" onClick={function () { if (!form.riderNo.trim() || !form.shortName.trim()) return; onCreate(form); onClose(); }} className="rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-md hover:shadow-xl hover:brightness-110 active:scale-[0.97] transition-all duration-300">Create Entry</button>
         </div>
       </div>
     </div>
@@ -323,38 +321,36 @@ function CreateTicketModal({ open, onClose, onCreate, staffOptions }) {
   useEffect(function () { if (!open) setForm(emptyForm); }, [open]);
   if (!open) return null;
 
-  const fieldClass = "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 transition-all duration-200";
+  const f = "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 transition-all duration-200";
+  const lb = "mb-1 font-semibold text-slate-500 text-[10px] uppercase tracking-wider";
   function set(key) { return function (e) { setForm(function (s) { var next = Object.assign({}, s); next[key] = e.target.value; return next; }); }; }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3">
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} style={{ animation: "fadeIn 0.2s ease-out" }} />
-      <div className="animate-slideUp relative w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-start justify-between gap-3 mb-6">
-          <div>
-            <h3 className="text-xl font-bold text-slate-900">New Ticket</h3>
-            <p className="mt-1 text-sm text-slate-400">Create a new rider support ticket</p>
-          </div>
-          <button type="button" onClick={onClose} className="rounded-xl border border-slate-200 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all duration-200">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+      <div className="animate-slideUp relative w-full max-w-xl rounded-2xl bg-white p-5 shadow-2xl max-h-[95vh] overflow-y-auto">
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <h3 className="text-lg font-bold text-slate-900">New Ticket</h3>
+          <button type="button" onClick={onClose} className="rounded-lg border border-slate-200 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all duration-200">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <label className="text-sm"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Rider No. *</div><input value={form.riderNo} onChange={set("riderNo")} className={fieldClass} /></label>
-          <label className="text-sm"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Rider Name *</div><input value={form.riderName} onChange={set("riderName")} className={fieldClass} /></label>
-          <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Issue *</div><input value={form.issue} onChange={set("issue")} className={fieldClass} /></label>
-          <label className="text-sm"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Received</div><input type="datetime-local" value={form.timestampReceived} onChange={set("timestampReceived")} className={fieldClass} /></label>
-          <label className="text-sm"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Acknowledged</div><select value={form.acknowledged} onChange={set("acknowledged")} className={fieldClass}><option value="">Not yet</option><option value="Done">Done</option></select></label>
-          <label className="text-sm"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Responsible Person</div><input list="staff-opts-create" value={form.responsiblePerson} onChange={set("responsiblePerson")} placeholder="Optional" className={fieldClass} /></label>
-          <label className="text-sm"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Escalated to</div><input list="staff-opts-create" value={form.escalatedTo} onChange={set("escalatedTo")} placeholder="Optional" className={fieldClass} /></label>
-          <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Solution</div><input value={form.solution} onChange={set("solution")} placeholder="Optional" className={fieldClass} /></label>
-          <label className="text-sm"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Status</div><select value={form.status} onChange={set("status")} className={fieldClass}>{STATUS_ORDER.map(function (s) { return <option key={s} value={s}>{s}</option>; })}</select></label>
-          <label className="text-sm"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Solved At</div><input type="datetime-local" value={form.timestampSolved} onChange={set("timestampSolved")} className={fieldClass} /></label>
-          <label className="text-sm sm:col-span-2"><div className="mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Duration</div><input value={form.duration} onChange={set("duration")} placeholder="e.g. 3 days, Same day" className={fieldClass} /></label>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <label className="text-sm"><div className={lb}>Rider No. *</div><input value={form.riderNo} onChange={set("riderNo")} className={f} /></label>
+          <label className="text-sm"><div className={lb}>Rider Name *</div><input value={form.riderName} onChange={set("riderName")} className={f} /></label>
+          <label className="text-sm sm:col-span-2"><div className={lb}>Issue *</div><input value={form.issue} onChange={set("issue")} className={f} /></label>
+          <label className="text-sm"><div className={lb}>Received</div><input type="datetime-local" value={form.timestampReceived} onChange={set("timestampReceived")} className={f} /></label>
+          <label className="text-sm"><div className={lb}>Acknowledged</div><select value={form.acknowledged} onChange={set("acknowledged")} className={f}><option value="">Not yet</option><option value="Done">Done</option></select></label>
+          <label className="text-sm"><div className={lb}>Responsible Person</div><input list="staff-opts-create" value={form.responsiblePerson} onChange={set("responsiblePerson")} placeholder="Optional" className={f} /></label>
+          <label className="text-sm"><div className={lb}>Escalated to</div><input list="staff-opts-create" value={form.escalatedTo} onChange={set("escalatedTo")} placeholder="Optional" className={f} /></label>
+          <label className="text-sm sm:col-span-2"><div className={lb}>Solution</div><input value={form.solution} onChange={set("solution")} placeholder="Optional" className={f} /></label>
+          <label className="text-sm"><div className={lb}>Status</div><select value={form.status} onChange={set("status")} className={f}>{STATUS_ORDER.map(function (s) { return <option key={s} value={s}>{s}</option>; })}</select></label>
+          <label className="text-sm"><div className={lb}>Solved At</div><input type="datetime-local" value={form.timestampSolved} onChange={set("timestampSolved")} className={f} /></label>
+          <label className="text-sm sm:col-span-2"><div className={lb}>Duration</div><input value={form.duration} onChange={set("duration")} placeholder="e.g. 3 days, Same day" className={f} /></label>
         </div>
-        <div className="mt-6 flex items-center justify-end gap-3">
-          <button type="button" onClick={onClose} className="rounded-xl px-4 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 transition-all duration-200">Cancel</button>
-          <button type="button" onClick={function () { if (!form.riderNo.trim() || !form.riderName.trim() || !form.issue.trim()) return; onCreate(form); onClose(); }} className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-xl hover:brightness-110 active:scale-[0.97] transition-all duration-300">Create Ticket</button>
+        <div className="mt-4 flex items-center justify-end gap-3">
+          <button type="button" onClick={onClose} className="rounded-xl px-4 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50 transition-all duration-200">Cancel</button>
+          <button type="button" onClick={function () { if (!form.riderNo.trim() || !form.riderName.trim() || !form.issue.trim()) return; onCreate(form); onClose(); }} className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-5 py-2 text-sm font-semibold text-white shadow-md hover:shadow-xl hover:brightness-110 active:scale-[0.97] transition-all duration-300">Create Ticket</button>
         </div>
         <datalist id="staff-opts-create">{staffOptions.map(function (n) { return <option key={n} value={n} />; })}</datalist>
       </div>
