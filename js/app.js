@@ -454,7 +454,7 @@ function App({ onLogout }) {
       { action: function () { openDashboard(); }, title: "All Tickets", desc: "View & manage tickets", count: summary.total, label: "total",
         gradient: "from-indigo-500 to-violet-600", iconBg: "bg-indigo-500/10 text-indigo-500",
         icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" },
-      { action: function () { openDashboard({ createOpen: true }); }, title: "New Ticket", desc: "Create support ticket", count: summary.unresolved, label: "active",
+      { action: function () { setCreateOpen(true); }, title: "New Ticket", desc: "Create support ticket", count: summary.unresolved, label: "active",
         gradient: "from-violet-500 to-purple-600", iconBg: "bg-violet-500/10 text-violet-500",
         icon: "M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" },
       { action: function () { openDashboard({ quickFilter: "escalated" }); }, title: "Escalated", desc: "Needs attention", count: summary.escalated, label: "tickets",
@@ -518,6 +518,7 @@ function App({ onLogout }) {
           </button>
         </div>
 
+        <CreateTicketModal open={createOpen} onClose={function () { setCreateOpen(false); }} onCreate={createTicket} staffOptions={staffOptions} />
         <Toasts items={toasts} />
       </div>
     );
