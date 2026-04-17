@@ -45,6 +45,16 @@ js/app.js               — Main App component, Root wrapper, state management, 
 - Toast notifications for save/delete feedback
 - ErrorBoundary wraps App to prevent white-screen crashes
 
+## Working Style
+
+- User is non-technical — go straight to implementation, minimal explanation
+- Keep code simple, efficient, no dead code
+- When many edits are scattered across a file, rewrite the whole file instead of many small edits
+- Modals must appear at top of screen (items-start), not centered
+- Don't narrate every step — just deliver
+- Start a new conversation when context gets long
+- Current stable backup: commit 019c7e3
+
 ## UI Architecture
 
 - **Compact table** (desktop): 5 columns — Rider, Issue, Status, Assigned, Duration
